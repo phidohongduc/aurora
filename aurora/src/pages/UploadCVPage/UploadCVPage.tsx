@@ -15,10 +15,7 @@ import {
   Chip,
   Box,
 } from '@mui/material'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import CloudUploadIcon from '@mui/icons-material/CloudUpload'
-import DescriptionIcon from '@mui/icons-material/Description'
-import DeleteIcon from '@mui/icons-material/Delete'
+import { ArrowLeft, CloudUpload, FileText, Trash2 } from 'lucide-react'
 import type { CV } from '@/types'
 import { getCVsForJob, uploadMultipleCVs, deleteCV } from './APIHandler'
 
@@ -122,7 +119,7 @@ export default function UploadCVPage() {
       <Button
         component={Link}
         to={`/jobs/${id}`}
-        startIcon={<ArrowBackIcon />}
+        startIcon={<ArrowLeft size={20} strokeWidth={1.5} />}
         sx={{ mb: 3 }}
       >
         Back to Job #{id}
@@ -153,7 +150,7 @@ export default function UploadCVPage() {
           backgroundColor: 'grey.50',
         }}
       >
-        <CloudUploadIcon sx={{ fontSize: 64, color: 'primary.main', mb: 2 }} />
+        <CloudUpload size={64} className="text-blue-600 mb-4" strokeWidth={1.5} />
         <Typography variant="h6" gutterBottom>
           Drag and drop CV files here
         </Typography>
@@ -192,7 +189,7 @@ export default function UploadCVPage() {
         ) : cvs.length === 0 ? (
           <List>
             <ListItem>
-              <DescriptionIcon sx={{ mr: 2, color: 'text.secondary' }} />
+              <FileText size={24} className="mr-4 text-gray-400" strokeWidth={1.5} />
               <ListItemText
                 primary="No CVs uploaded yet."
                 primaryTypographyProps={{ color: 'text.secondary' }}
@@ -203,7 +200,7 @@ export default function UploadCVPage() {
           <List>
             {cvs.map((cv) => (
               <ListItem key={cv.id} divider>
-                <DescriptionIcon sx={{ mr: 2, color: 'primary.main' }} />
+                <FileText size={24} className="mr-4 text-blue-600" strokeWidth={1.5} />
                 <ListItemText
                   primary={cv.fileName}
                   secondary={`${formatFileSize(cv.fileSize)} • ${formatDate(cv.uploadedAt)}`}
@@ -221,7 +218,7 @@ export default function UploadCVPage() {
                     onClick={() => handleDelete(cv.id)}
                     color="error"
                   >
-                    <DeleteIcon />
+                    <Trash2 size={20} strokeWidth={1.5} />
                   </IconButton>
                 </ListItemSecondaryAction>
               </ListItem>

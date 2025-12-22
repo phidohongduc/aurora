@@ -15,10 +15,7 @@ import {
   InputAdornment,
   Divider,
 } from '@mui/material'
-import WorkIcon from '@mui/icons-material/Work'
-import LocationOnIcon from '@mui/icons-material/LocationOn'
-import PeopleIcon from '@mui/icons-material/People'
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney'
+import { Briefcase, MapPin, Users, DollarSign } from 'lucide-react'
 import type { LocationType, EmploymentType } from '@/types'
 import { createJob } from './APIHandler'
 
@@ -155,7 +152,7 @@ export default function CreateJobPage() {
           {/* Basic Information Section */}
           <Box sx={{ mb: 5 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
-              <WorkIcon sx={{ color: 'primary.main' }} />
+              <Briefcase size={24} className="text-blue-600" strokeWidth={1.5} />
               <Typography variant="h6" fontWeight="600">
                 Basic Information
               </Typography>
@@ -210,7 +207,7 @@ export default function CreateJobPage() {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <LocationOnIcon fontSize="small" />
+                        <MapPin size={18} strokeWidth={1.5} />
                       </InputAdornment>
                     ),
                   }}
@@ -248,7 +245,7 @@ export default function CreateJobPage() {
           {/* Experience & Skills Section */}
           <Box sx={{ mb: 5 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
-              <PeopleIcon sx={{ color: 'primary.main' }} />
+              <Users size={24} className="text-blue-600" strokeWidth={1.5} />
               <Typography variant="h6" fontWeight="600">
                 Experience & Skills
               </Typography>
@@ -372,7 +369,7 @@ export default function CreateJobPage() {
           {/* Compensation Section */}
           <Box sx={{ mb: 4 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
-              <AttachMoneyIcon sx={{ color: 'primary.main' }} />
+              <DollarSign size={24} className="text-blue-600" strokeWidth={1.5} />
               <Typography variant="h6" fontWeight="600">
                 Compensation
               </Typography>

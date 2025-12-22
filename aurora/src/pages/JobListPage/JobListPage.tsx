@@ -16,8 +16,7 @@ import {
   IconButton,
   CircularProgress,
 } from '@mui/material'
-import AddIcon from '@mui/icons-material/Add'
-import VisibilityIcon from '@mui/icons-material/Visibility'
+import { Plus, Eye } from 'lucide-react'
 import type { JobRequisition } from '@/types'
 import { getJobList } from './APIHandler'
 
@@ -77,7 +76,7 @@ export default function JobListPage() {
           component={Link}
           to="/jobs/new"
           variant="contained"
-          startIcon={<AddIcon />}
+          startIcon={<Plus size={20} strokeWidth={2} />}
         >
           Create New
         </Button>
@@ -130,7 +129,7 @@ export default function JobListPage() {
                         size="small"
                         color="primary"
                       >
-                        <VisibilityIcon />
+                        <Eye size={20} strokeWidth={1.5} />
                       </IconButton>
                     </TableCell>
                   </TableRow>

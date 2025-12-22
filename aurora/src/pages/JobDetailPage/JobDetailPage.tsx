@@ -13,13 +13,7 @@ import {
   Alert,
   Grid,
 } from '@mui/material'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import UploadFileIcon from '@mui/icons-material/UploadFile'
-import EditIcon from '@mui/icons-material/Edit'
-import WorkIcon from '@mui/icons-material/Work'
-import LocationOnIcon from '@mui/icons-material/LocationOn'
-import PeopleIcon from '@mui/icons-material/People'
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney'
+import { ArrowLeft, Upload, Pencil, Briefcase, MapPin, Users, DollarSign } from 'lucide-react'
 import type { JobRequisition, CV } from '@/types'
 import { getJobDetail, getJobCVs } from './APIHandler'
 
@@ -112,7 +106,7 @@ export default function JobDetailPage() {
         <Button
           component={Link}
           to="/jobs"
-          startIcon={<ArrowBackIcon />}
+          startIcon={<ArrowLeft size={20} strokeWidth={1.5} />}
           sx={{ mb: 3 }}
         >
           Back to Jobs
@@ -127,7 +121,7 @@ export default function JobDetailPage() {
       <Button
         component={Link}
         to="/jobs"
-        startIcon={<ArrowBackIcon />}
+        startIcon={<ArrowLeft size={20} strokeWidth={1.5} />}
         sx={{ mb: 3 }}
       >
         Back to Jobs
@@ -162,7 +156,7 @@ export default function JobDetailPage() {
         {/* Basic Information */}
         <Box sx={{ mb: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-            <WorkIcon sx={{ color: 'primary.main' }} />
+            <Briefcase size={24} className="text-blue-600" strokeWidth={1.5} />
             <Typography variant="h6" fontWeight="600">
               Basic Information
             </Typography>
@@ -182,7 +176,7 @@ export default function JobDetailPage() {
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
               <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <LocationOnIcon fontSize="small" /> Location
+                <MapPin size={16} strokeWidth={1.5} /> Location
               </Typography>
               <Typography variant="body1">{job.location}</Typography>
             </Grid>
@@ -212,7 +206,7 @@ export default function JobDetailPage() {
         {/* Experience & Skills */}
         <Box sx={{ mb: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-            <PeopleIcon sx={{ color: 'primary.main' }} />
+            <Users size={24} className="text-blue-600" strokeWidth={1.5} />
             <Typography variant="h6" fontWeight="600">
               Experience & Skills
             </Typography>
@@ -279,7 +273,7 @@ export default function JobDetailPage() {
         {/* Compensation */}
         <Box sx={{ mb: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-            <AttachMoneyIcon sx={{ color: 'primary.main' }} />
+            <DollarSign size={24} className="text-blue-600" strokeWidth={1.5} />
             <Typography variant="h6" fontWeight="600">
               Compensation
             </Typography>
@@ -300,11 +294,11 @@ export default function JobDetailPage() {
             component={Link}
             to={`/jobs/${id}/upload`}
             variant="contained"
-            startIcon={<UploadFileIcon />}
+            startIcon={<Upload size={20} strokeWidth={1.5} />}
           >
             Upload CVs
           </Button>
-          <Button variant="outlined" startIcon={<EditIcon />}>
+          <Button variant="outlined" startIcon={<Pencil size={20} strokeWidth={1.5} />}>
             Edit
           </Button>
         </Stack>

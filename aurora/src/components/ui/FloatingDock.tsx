@@ -15,7 +15,7 @@ import {
 } from 'motion/react'
 import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import MenuIcon from '@mui/icons-material/Menu'
+import { Menu } from 'lucide-react'
 
 export interface DockItem {
   title: string
@@ -76,9 +76,9 @@ const FloatingDockMobile = ({
                 <Link
                   to={item.href}
                   onClick={() => setOpen(false)}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md"
+                  className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white border border-slate-200 shadow-lg"
                 >
-                  <div className="h-4 w-4">{item.icon}</div>
+                  <div className="h-5 w-5">{item.icon}</div>
                 </Link>
               </motion.div>
             ))}
@@ -87,9 +87,9 @@ const FloatingDockMobile = ({
       </AnimatePresence>
       <button
         onClick={() => setOpen(!open)}
-        className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md"
+        className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white border border-slate-200 shadow-lg"
       >
-        <MenuIcon className="h-5 w-5 text-gray-600" />
+        <Menu className="h-5 w-5 text-slate-600" strokeWidth={1.5} />
       </button>
     </div>
   )
@@ -108,7 +108,7 @@ const FloatingDockDesktop = ({
       onMouseMove={(e) => mouseX.set(e.pageX)}
       onMouseLeave={() => mouseX.set(Infinity)}
       className={cn(
-        'mx-auto hidden h-16 items-end gap-4 rounded-2xl bg-white px-4 pb-3 shadow-lg md:flex',
+        'mx-auto hidden h-16 items-end gap-4 rounded-2xl bg-white border border-slate-200 px-4 pb-3 shadow-lg md:flex',
         className
       )}
     >
@@ -178,7 +178,7 @@ function IconContainer({
         style={{ width, height }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        className="relative flex aspect-square items-center justify-center rounded-full bg-gray-100 transition-colors hover:bg-gray-200"
+        className="relative flex aspect-square items-center justify-center rounded-2xl bg-slate-100 transition-colors hover:bg-slate-200"
       >
         <AnimatePresence>
           {hovered && (
@@ -186,7 +186,7 @@ function IconContainer({
               initial={{ opacity: 0, y: 10, x: '-50%' }}
               animate={{ opacity: 1, y: 0, x: '-50%' }}
               exit={{ opacity: 0, y: 2, x: '-50%' }}
-              className="absolute -top-8 left-1/2 w-fit whitespace-pre rounded-md border border-gray-200 bg-white px-2 py-0.5 text-xs text-gray-700 shadow-sm"
+              className="absolute -top-8 left-1/2 w-fit whitespace-pre rounded-xl border border-slate-200 bg-white px-3 py-1 text-xs text-slate-700 shadow-sm"
             >
               {title}
             </motion.div>
