@@ -1,36 +1,72 @@
 import { Link, useParams } from 'react-router-dom'
+import {
+  Container,
+  Typography,
+  Button,
+  Paper,
+  List,
+  ListItem,
+  ListItemText,
+} from '@mui/material'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import CloudUploadIcon from '@mui/icons-material/CloudUpload'
+import DescriptionIcon from '@mui/icons-material/Description'
 
 export default function UploadCVPage() {
   const { id } = useParams<{ id: string }>()
 
   return (
-    <div className="flex flex-1 flex-col p-8">
-      <div className="mb-6 flex items-center gap-4">
-        <Link
-          to={`/jobs/${id}`}
-          className="text-blue-400 transition-colors hover:text-blue-300"
-        >
-          &larr; Back to Job #{id}
-        </Link>
-      </div>
-      <h1 className="mb-6 text-3xl font-bold">Upload CVs</h1>
-      <div className="max-w-2xl">
-        <div className="mb-6 rounded-lg border-2 border-dashed border-gray-600 bg-neutral-900 p-12 text-center">
-          <div className="mb-4 text-4xl">📄</div>
-          <p className="mb-2 text-lg">Drag and drop CV files here</p>
-          <p className="mb-4 text-sm text-gray-400">or</p>
-          <button className="rounded-lg bg-blue-600 px-6 py-2 text-white transition-colors hover:bg-blue-700">
-            Browse Files
-          </button>
-          <p className="mt-4 text-sm text-gray-400">
-            Supported formats: PDF, DOC, DOCX
-          </p>
-        </div>
-        <div className="rounded-lg border border-gray-700 bg-neutral-900 p-4">
-          <h2 className="mb-4 text-lg font-semibold">Uploaded CVs</h2>
-          <p className="text-gray-400">No CVs uploaded yet.</p>
-        </div>
-      </div>
-    </div>
+    <Container maxWidth="md" sx={{ py: 4 }}>
+      <Button
+        component={Link}
+        to={`/jobs/${id}`}
+        startIcon={<ArrowBackIcon />}
+        sx={{ mb: 3 }}
+      >
+        Back to Job #{id}
+      </Button>
+      <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
+        Upload CVs
+      </Typography>
+      <Paper
+        sx={{
+          p: 6,
+          mt: 3,
+          textAlign: 'center',
+          border: '2px dashed',
+          borderColor: 'divider',
+          backgroundColor: 'grey.50',
+        }}
+      >
+        <CloudUploadIcon sx={{ fontSize: 64, color: 'primary.main', mb: 2 }} />
+        <Typography variant="h6" gutterBottom>
+          Drag and drop CV files here
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+          or
+        </Typography>
+        <Button variant="contained" component="label">
+          Browse Files
+          <input type="file" hidden multiple accept=".pdf,.doc,.docx" />
+        </Button>
+        <Typography variant="caption" display="block" sx={{ mt: 2 }} color="text.secondary">
+          Supported formats: PDF, DOC, DOCX
+        </Typography>
+      </Paper>
+      <Paper sx={{ p: 3, mt: 3 }}>
+        <Typography variant="h6" gutterBottom>
+          Uploaded CVs
+        </Typography>
+        <List>
+          <ListItem>
+            <DescriptionIcon sx={{ mr: 2, color: 'text.secondary' }} />
+            <ListItemText
+              primary="No CVs uploaded yet."
+              primaryTypographyProps={{ color: 'text.secondary' }}
+            />
+          </ListItem>
+        </List>
+      </Paper>
+    </Container>
   )
 }
