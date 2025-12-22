@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useNavigate } from 'react-router-dom'
 import {
   Container,
   Typography,
@@ -24,6 +24,7 @@ import { getCVsForJob, uploadCV, uploadMultipleCVs, deleteCV, getJobDetail } fro
 
 export default function UploadCVPage() {
   const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
   const [job, setJob] = useState<JobRequisition | null>(null)
   const [cvs, setCvs] = useState<CV[]>([])
   const [loading, setLoading] = useState(true)
@@ -533,6 +534,7 @@ export default function UploadCVPage() {
           <Button
             variant="contained"
             size="large"
+            onClick={() => navigate(`/jobs/${id}`)}
             sx={{
               px: 4,
               py: 1.5,
