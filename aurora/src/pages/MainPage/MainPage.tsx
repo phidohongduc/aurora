@@ -1,11 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import {
-  Container,
   Typography,
   Box,
-  Paper,
-  Grid,
-  CircularProgress,
   Button,
 } from '@mui/material'
 import { Briefcase, FolderOpen, FileText, Clock } from 'lucide-react'
@@ -15,6 +11,8 @@ import type { Engine } from 'tsparticles-engine'
 import type { DashboardStats } from '@/types'
 import { getDashboardStats } from './APIHandler'
 import { useNavigate } from 'react-router-dom'
+import { driver } from 'driver.js'
+import 'driver.js/dist/driver.css'
 
 /**
  * MainPage
@@ -25,7 +23,6 @@ import { useNavigate } from 'react-router-dom'
  */
 export default function MainPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null)
-  const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -35,25 +32,47 @@ export default function MainPage() {
         if (response.success) {
           setStats(response.data)
         }
-      } finally {
-        setLoading(false)
+      } catch (error) {
+        console.error('Failed to fetch dashboard stats:', error)
       }
     }
     fetchStats()
   }, [])
 
+  useEffect(() => {
+    // Listen for event from AI Companion to trigger tour
+    const handleShowCreateJobTour = () => {
+      const driverObj = driver({
+        showProgress: true,
+        steps: [
+          {
+            element: '.create-job-hero-btn',
+            popover: {
+              title: 'Create Your Job Here',
+              description: 'Click this button to start creating a new job requisition with AI assistance',
+              side: 'bottom',
+              align: 'center',
+            },
+          },
+        ],
+        onDestroyStarted: () => {
+          driverObj.destroy()
+        },
+      })
+
+      driverObj.drive()
+    }
+
+    window.addEventListener('showCreateJobTour', handleShowCreateJobTour)
+    
+    return () => {
+      window.removeEventListener('showCreateJobTour', handleShowCreateJobTour)
+    }
+  }, [])
+
   const particlesInit = useCallback(async (engine: Engine) => {
     await loadSlim(engine)
   }, [])
-
-  const statCards = stats
-    ? [
-      { label: 'Total Jobs', value: stats.totalJobs, icon: Briefcase, color: '#3b82f6' },
-      { label: 'Open Positions', value: stats.openJobs, icon: FolderOpen, color: '#22c55e' },
-      { label: 'Total CVs', value: stats.totalCVs, icon: FileText, color: '#f97316' },
-      { label: 'Pending Reviews', value: stats.pendingReviews, icon: Clock, color: '#a855f7' },
-    ]
-    : []
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#fafafa' }}>
@@ -146,6 +165,7 @@ export default function MainPage() {
             <Button
               variant="contained"
               size="large"
+              className="create-job-hero-btn"
               sx={{
                 px: 4,
                 py: 1.5,

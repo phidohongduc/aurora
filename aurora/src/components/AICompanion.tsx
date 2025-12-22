@@ -91,7 +91,7 @@ export function AICompanion() {
                 {
                     id: 'm1',
                     role: 'assistant',
-                    content: "Welcome to Aurora! I'm your AI hiring assistant. I can help you with creating jobs, screening candidates, and making better hiring decisions.",
+                    content: "Welcome to Aurora! I'm your AI hiring assistant. I can help you with creating jobs, screening candidates, and making better hiring decisions. Ask me 'How can I create a job?' to get started!",
                     timestamp: new Date(),
                 },
             ])
@@ -169,10 +169,24 @@ export function AICompanion() {
         } else {
             // Simulate AI response for other queries
             setTimeout(() => {
+                let responseContent = "I'm analyzing your request... This is a demo response. In a real implementation, this would be powered by an AI model to provide contextual assistance."
+                
+                // Special handling for "how can I create a job" on main page
+                if (location.pathname === '/' && 
+                    (userInput.toLowerCase().includes('create') && userInput.toLowerCase().includes('job'))) {
+                    responseContent = "To create a new job, click the 'Create New Job' button on this page. I'll highlight it for you now! 👇"
+                    
+                    // Trigger the tour to highlight the Create Job button
+                    setTimeout(() => {
+                        const event = new CustomEvent('showCreateJobTour')
+                        window.dispatchEvent(event)
+                    }, 500)
+                }
+                
                 const aiResponse: Message = {
                     id: `msg-${Date.now()}-ai`,
                     role: 'assistant',
-                    content: "I'm analyzing your request... This is a demo response. In a real implementation, this would be powered by an AI model to provide contextual assistance.",
+                    content: responseContent,
                     timestamp: new Date(),
                 }
                 setMessages(prev => [...prev, aiResponse])
@@ -189,6 +203,26 @@ export function AICompanion() {
         }
 
         setMessages([...messages, userMessage])
+
+        // Special handling for "How can I create a job?" suggestion
+        if (location.pathname === '/' && suggestion.text.toLowerCase().includes('create') && suggestion.text.toLowerCase().includes('job')) {
+            setTimeout(() => {
+                const aiResponse: Message = {
+                    id: `msg-${Date.now()}-ai`,
+                    role: 'assistant',
+                    content: "To create a new job, click the 'Create New Job' button on this page. I'll highlight it for you now! 👇",
+                    timestamp: new Date(),
+                }
+                setMessages(prev => [...prev, aiResponse])
+                
+                // Trigger the tour to highlight the Create Job button
+                setTimeout(() => {
+                    const event = new CustomEvent('showCreateJobTour')
+                    window.dispatchEvent(event)
+                }, 500)
+            }, 800)
+            return
+        }
 
         // Check if this is a job generation suggestion on create job page
         if (location.pathname === '/jobs/new') {
