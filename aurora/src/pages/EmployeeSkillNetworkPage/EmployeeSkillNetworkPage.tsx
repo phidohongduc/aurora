@@ -7,9 +7,11 @@ import {
   Paper,
   Chip,
   IconButton,
-  Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
 } from '@mui/material'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, X } from 'lucide-react'
 import { motion } from 'motion/react'
 import {
   ReactFlow,
@@ -37,132 +39,263 @@ interface EmployeeData extends Record<string, unknown> {
   id: string
   name: string
   role: string
+  skills: Array<{ name: string; level: number }>
 }
 
-interface SkillData extends Record<string, unknown> {
+interface ProjectData extends Record<string, unknown> {
+  id: string
   name: string
-  isHighlighted?: boolean
-  deepestExpert?: string
+  lobId: string
 }
 
-interface SkillCluster extends Record<string, unknown> {
+interface LOBData extends Record<string, unknown> {
   id: string
   name: string
   color: string
-}
-
-interface EmployeeSkillEdgeData extends Record<string, unknown> {
-  expertiseLevel: number
-  confidenceScore: number
 }
 
 // ============================================================================
 // MOCK DATA
 // ============================================================================
 
+const mockLOBs: LOBData[] = [
+  { id: 'lob-ans', name: 'ANS', color: '#3b82f6' },
+  { id: 'lob-it', name: 'IT Group', color: '#f59e0b' },
+  { id: 'lob-mss', name: 'MSS', color: '#10b981' },
+]
+
+const mockProjects: ProjectData[] = [
+  // ANS Projects
+  { id: 'proj-sds', name: 'SDS 2.0', lobId: 'lob-ans' },
+  { id: 'proj-starview', name: 'Starview', lobId: 'lob-ans' },
+  { id: 'proj-phoenix', name: 'Phoenix', lobId: 'lob-ans' },
+  // IT Group Projects
+  { id: 'proj-portal', name: 'Employee Portal', lobId: 'lob-it' },
+  { id: 'proj-analytics', name: 'Analytics Hub', lobId: 'lob-it' },
+  { id: 'proj-automation', name: 'Automation Suite', lobId: 'lob-it' },
+  // MSS Projects
+  { id: 'proj-sentinel', name: 'Sentinel', lobId: 'lob-mss' },
+  { id: 'proj-guardian', name: 'Guardian', lobId: 'lob-mss' },
+  { id: 'proj-shield', name: 'Shield', lobId: 'lob-mss' },
+]
+
 const mockEmployees: EmployeeData[] = [
-  { id: 'emp-1', name: 'Sarah Johnson', role: 'Senior Frontend Engineer' },
-  { id: 'emp-2', name: 'Michael Chen', role: 'Backend Engineer' },
-  { id: 'emp-3', name: 'David Kim', role: 'Cloud Architect' },
-  { id: 'emp-4', name: 'Emily Rodriguez', role: 'Full Stack Developer' },
-  { id: 'emp-5', name: 'James Wilson', role: 'DevOps Engineer' },
-  { id: 'emp-6', name: 'Jessica Brown', role: 'Senior Backend Engineer' },
-  { id: 'emp-7', name: 'Robert Taylor', role: 'Frontend Developer' },
-  { id: 'emp-8', name: 'Linda Martinez', role: 'Data Engineer' },
-  { id: 'emp-9', name: 'Thomas Anderson', role: 'Platform Engineer' },
+  { 
+    id: 'emp-1', 
+    name: 'Sarah Johnson', 
+    role: 'Senior Frontend Engineer',
+    skills: [
+      { name: 'React', level: 5 },
+      { name: 'TypeScript', level: 5 },
+      { name: 'Node.js', level: 3 },
+    ]
+  },
+  { 
+    id: 'emp-2', 
+    name: 'Michael Chen', 
+    role: 'Backend Engineer',
+    skills: [
+      { name: 'Python', level: 4 },
+      { name: 'SQL', level: 5 },
+      { name: 'GraphQL', level: 3 },
+    ]
+  },
+  { 
+    id: 'emp-3', 
+    name: 'David Kim', 
+    role: 'Cloud Architect',
+    skills: [
+      { name: 'AWS', level: 5 },
+      { name: 'Docker', level: 5 },
+      { name: 'Kubernetes', level: 4 },
+    ]
+  },
+  { 
+    id: 'emp-4', 
+    name: 'Emily Rodriguez', 
+    role: 'Full Stack Developer',
+    skills: [
+      { name: 'React', level: 4 },
+      { name: 'Node.js', level: 4 },
+      { name: 'SQL', level: 3 },
+    ]
+  },
+  { 
+    id: 'emp-5', 
+    name: 'James Wilson', 
+    role: 'DevOps Engineer',
+    skills: [
+      { name: 'Docker', level: 5 },
+      { name: 'Kubernetes', level: 4 },
+      { name: 'Python', level: 3 },
+    ]
+  },
+  { 
+    id: 'emp-6', 
+    name: 'Jessica Brown', 
+    role: 'Senior Backend Engineer',
+    skills: [
+      { name: 'Node.js', level: 5 },
+      { name: 'GraphQL', level: 4 },
+      { name: 'AWS', level: 3 },
+    ]
+  },
+  { 
+    id: 'emp-7', 
+    name: 'Robert Taylor', 
+    role: 'Frontend Developer',
+    skills: [
+      { name: 'React', level: 4 },
+      { name: 'TypeScript', level: 4 },
+      { name: 'Vue.js', level: 3 },
+    ]
+  },
+  { 
+    id: 'emp-8', 
+    name: 'Linda Martinez', 
+    role: 'Data Engineer',
+    skills: [
+      { name: 'Python', level: 5 },
+      { name: 'SQL', level: 5 },
+      { name: 'AWS', level: 4 },
+    ]
+  },
+  { 
+    id: 'emp-9', 
+    name: 'Thomas Anderson', 
+    role: 'Platform Engineer',
+    skills: [
+      { name: 'Kubernetes', level: 5 },
+      { name: 'Docker', level: 4 },
+      { name: 'Python', level: 4 },
+    ]
+  },
+  { 
+    id: 'emp-10', 
+    name: 'Alex Thompson', 
+    role: 'Security Engineer',
+    skills: [
+      { name: 'Python', level: 4 },
+      { name: 'AWS', level: 4 },
+      { name: 'Docker', level: 3 },
+    ]
+  },
+  { 
+    id: 'emp-11', 
+    name: 'Maria Garcia', 
+    role: 'UI/UX Developer',
+    skills: [
+      { name: 'React', level: 4 },
+      { name: 'TypeScript', level: 3 },
+      { name: 'Vue.js', level: 4 },
+    ]
+  },
+  { 
+    id: 'emp-12', 
+    name: 'Kevin Lee', 
+    role: 'System Architect',
+    skills: [
+      { name: 'AWS', level: 5 },
+      { name: 'Kubernetes', level: 4 },
+      { name: 'Node.js', level: 3 },
+    ]
+  },
 ]
 
-const mockSkillClusters: SkillCluster[] = [
-  { id: 'cluster-backend', name: 'Backend', color: '#3b82f6' },
-  { id: 'cluster-frontend', name: 'Frontend', color: '#f59e0b' },
-  { id: 'cluster-cloud', name: 'Cloud & Infrastructure', color: '#10b981' },
+// Project → Employee assignments
+const projectEmployees = [
+  // SDS 2.0
+  { projectId: 'proj-sds', employeeId: 'emp-1' },
+  { projectId: 'proj-sds', employeeId: 'emp-2' },
+  { projectId: 'proj-sds', employeeId: 'emp-3' },
+  // Starview
+  { projectId: 'proj-starview', employeeId: 'emp-4' },
+  { projectId: 'proj-starview', employeeId: 'emp-5' },
+  // Phoenix
+  { projectId: 'proj-phoenix', employeeId: 'emp-6' },
+  { projectId: 'proj-phoenix', employeeId: 'emp-7' },
+  // Employee Portal
+  { projectId: 'proj-portal', employeeId: 'emp-1' },
+  { projectId: 'proj-portal', employeeId: 'emp-8' },
+  // Analytics Hub
+  { projectId: 'proj-analytics', employeeId: 'emp-2' },
+  { projectId: 'proj-analytics', employeeId: 'emp-9' },
+  { projectId: 'proj-analytics', employeeId: 'emp-10' },
+  // Automation Suite
+  { projectId: 'proj-automation', employeeId: 'emp-11' },
+  // Sentinel
+  { projectId: 'proj-sentinel', employeeId: 'emp-3' },
+  { projectId: 'proj-sentinel', employeeId: 'emp-12' },
+  // Guardian
+  { projectId: 'proj-guardian', employeeId: 'emp-5' },
+  { projectId: 'proj-guardian', employeeId: 'emp-10' },
+  // Shield
+  { projectId: 'proj-shield', employeeId: 'emp-8' },
+  { projectId: 'proj-shield', employeeId: 'emp-9' },
 ]
-
-// Skills with their cluster assignment
-const mockSkills = [
-  // Backend
-  { id: 'skill-python', name: 'Python', clusterId: 'cluster-backend' },
-  { id: 'skill-nodejs', name: 'Node.js', clusterId: 'cluster-backend' },
-  { id: 'skill-sql', name: 'SQL', clusterId: 'cluster-backend' },
-  { id: 'skill-graphql', name: 'GraphQL', clusterId: 'cluster-backend' },
-  // Frontend
-  { id: 'skill-react', name: 'React', clusterId: 'cluster-frontend' },
-  { id: 'skill-typescript', name: 'TypeScript', clusterId: 'cluster-frontend' },
-  { id: 'skill-vue', name: 'Vue.js', clusterId: 'cluster-frontend' },
-  // Cloud
-  { id: 'skill-aws', name: 'AWS', clusterId: 'cluster-cloud' },
-  { id: 'skill-docker', name: 'Docker', clusterId: 'cluster-cloud' },
-  { id: 'skill-kubernetes', name: 'Kubernetes', clusterId: 'cluster-cloud' },
-]
-
-// Employee → Skill relationships with expertise levels
-const employeeSkills = [
-  // Sarah Johnson - Senior Frontend Engineer
-  { employeeId: 'emp-1', skillId: 'skill-react', expertiseLevel: 5, confidenceScore: 0.98 },
-  { employeeId: 'emp-1', skillId: 'skill-typescript', expertiseLevel: 5, confidenceScore: 0.96 },
-  { employeeId: 'emp-1', skillId: 'skill-aws', expertiseLevel: 3, confidenceScore: 0.85 },
-  
-  // Michael Chen - Backend Engineer
-  { employeeId: 'emp-2', skillId: 'skill-nodejs', expertiseLevel: 5, confidenceScore: 0.95 },
-  { employeeId: 'emp-2', skillId: 'skill-sql', expertiseLevel: 4, confidenceScore: 0.92 },
-  { employeeId: 'emp-2', skillId: 'skill-graphql', expertiseLevel: 4, confidenceScore: 0.90 },
-  { employeeId: 'emp-2', skillId: 'skill-aws', expertiseLevel: 4, confidenceScore: 0.88 },
-  
-  // David Kim - Cloud Architect (AWS deep expert)
-  { employeeId: 'emp-3', skillId: 'skill-aws', expertiseLevel: 5, confidenceScore: 0.99 },
-  { employeeId: 'emp-3', skillId: 'skill-docker', expertiseLevel: 5, confidenceScore: 0.97 },
-  { employeeId: 'emp-3', skillId: 'skill-kubernetes', expertiseLevel: 5, confidenceScore: 0.96 },
-  { employeeId: 'emp-3', skillId: 'skill-python', expertiseLevel: 4, confidenceScore: 0.91 },
-  
-  // Emily Rodriguez - Full Stack Developer
-  { employeeId: 'emp-4', skillId: 'skill-react', expertiseLevel: 4, confidenceScore: 0.93 },
-  { employeeId: 'emp-4', skillId: 'skill-nodejs', expertiseLevel: 4, confidenceScore: 0.91 },
-  { employeeId: 'emp-4', skillId: 'skill-typescript', expertiseLevel: 4, confidenceScore: 0.94 },
-  { employeeId: 'emp-4', skillId: 'skill-sql', expertiseLevel: 3, confidenceScore: 0.87 },
-  
-  // James Wilson - DevOps Engineer
-  { employeeId: 'emp-5', skillId: 'skill-docker', expertiseLevel: 5, confidenceScore: 0.95 },
-  { employeeId: 'emp-5', skillId: 'skill-kubernetes', expertiseLevel: 4, confidenceScore: 0.93 },
-  { employeeId: 'emp-5', skillId: 'skill-aws', expertiseLevel: 4, confidenceScore: 0.90 },
-  { employeeId: 'emp-5', skillId: 'skill-python', expertiseLevel: 3, confidenceScore: 0.86 },
-  
-  // Jessica Brown - Senior Backend Engineer
-  { employeeId: 'emp-6', skillId: 'skill-python', expertiseLevel: 5, confidenceScore: 0.97 },
-  { employeeId: 'emp-6', skillId: 'skill-sql', expertiseLevel: 5, confidenceScore: 0.95 },
-  { employeeId: 'emp-6', skillId: 'skill-nodejs', expertiseLevel: 3, confidenceScore: 0.84 },
-  
-  // Robert Taylor - Frontend Developer
-  { employeeId: 'emp-7', skillId: 'skill-react', expertiseLevel: 4, confidenceScore: 0.90 },
-  { employeeId: 'emp-7', skillId: 'skill-vue', expertiseLevel: 5, confidenceScore: 0.94 },
-  { employeeId: 'emp-7', skillId: 'skill-typescript', expertiseLevel: 3, confidenceScore: 0.88 },
-  
-  // Linda Martinez - Data Engineer (only GraphQL expert - RISK)
-  { employeeId: 'emp-8', skillId: 'skill-python', expertiseLevel: 5, confidenceScore: 0.96 },
-  { employeeId: 'emp-8', skillId: 'skill-sql', expertiseLevel: 5, confidenceScore: 0.98 },
-  { employeeId: 'emp-8', skillId: 'skill-graphql', expertiseLevel: 5, confidenceScore: 0.97 },
-  
-  // Thomas Anderson - Platform Engineer
-  { employeeId: 'emp-9', skillId: 'skill-kubernetes', expertiseLevel: 4, confidenceScore: 0.91 },
-  { employeeId: 'emp-9', skillId: 'skill-docker', expertiseLevel: 4, confidenceScore: 0.89 },
-  { employeeId: 'emp-9', skillId: 'skill-nodejs', expertiseLevel: 3, confidenceScore: 0.85 },
-]
-
-// Calculate deepest expert per skill
-const getDeepestExpert = (skillId: string) => {
-  const experts = employeeSkills
-    .filter((es) => es.skillId === skillId)
-    .sort((a, b) => b.expertiseLevel - a.expertiseLevel || b.confidenceScore - a.confidenceScore)
-  
-  if (experts.length === 0) return undefined
-  
-  const topExpert = experts[0]
-  const employee = mockEmployees.find((e) => e.id === topExpert.employeeId)
-  return employee?.name
-}
 
 // ============================================================================
 // CUSTOM NODE COMPONENTS
 // ============================================================================
+
+function LOBNode({ data }: { data: LOBData }) {
+  return (
+    <Box
+      sx={{
+        width: 220,
+        p: 3,
+        bgcolor: data.color + '15',
+        border: `3px solid ${data.color}`,
+        borderRadius: 4,
+        textAlign: 'center',
+      }}
+    >
+      <Handle type="source" position={Position.Bottom} style={{ opacity: 0 }} />
+      
+      <Typography 
+        variant="h6" 
+        fontWeight="bold"
+        sx={{ color: data.color }}
+      >
+        {data.name}
+      </Typography>
+      <Typography variant="caption" color="text.secondary">
+        Line of Business
+      </Typography>
+    </Box>
+  )
+}
+
+function ProjectNode({ data }: { data: ProjectData }) {
+  return (
+    <Box
+      sx={{
+        width: 180,
+        p: 2,
+        bgcolor: 'white',
+        border: '2px solid #cbd5e1',
+        borderRadius: 3,
+        textAlign: 'center',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        transition: 'all 0.2s ease',
+        '&:hover': {
+          transform: 'scale(1.05)',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+        },
+      }}
+    >
+      <Handle type="target" position={Position.Top} style={{ opacity: 0 }} />
+      <Handle type="source" position={Position.Bottom} style={{ opacity: 0 }} />
+      
+      <Typography variant="body1" fontWeight={600}>
+        {data.name}
+      </Typography>
+      <Typography variant="caption" color="text.secondary">
+        Project
+      </Typography>
+    </Box>
+  )
+}
 
 function EmployeeNode({ data }: { data: EmployeeData }) {
   return (
@@ -175,6 +308,12 @@ function EmployeeNode({ data }: { data: EmployeeData }) {
         color: 'white',
         textAlign: 'center',
         boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+        '&:hover': {
+          transform: 'scale(1.05)',
+          boxShadow: '0 6px 16px rgba(0,0,0,0.2)',
+        },
       }}
     >
       <Handle type="target" position={Position.Top} style={{ opacity: 0 }} />
@@ -189,94 +328,10 @@ function EmployeeNode({ data }: { data: EmployeeData }) {
   )
 }
 
-function SkillNode({ data }: { data: SkillData }) {
-  const employeeCount = employeeSkills.filter((es) => es.skillId === `skill-${data.name.toLowerCase().replace(/\./g, '')}`).length
-  const isRisk = employeeCount === 1
-  
-  return (
-    <Tooltip
-      title={
-        <Box sx={{ p: 1 }}>
-          <Typography variant="body2" fontWeight="bold" gutterBottom>
-            {data.name}
-          </Typography>
-          <Typography variant="caption" display="block">
-            Employees with this skill: {employeeCount}
-          </Typography>
-          {data.deepestExpert && (
-            <Typography variant="caption" display="block" sx={{ mt: 1, color: '#fbbf24' }}>
-              💡 Suggested mentor: {data.deepestExpert}
-            </Typography>
-          )}
-          {isRisk && (
-            <Typography variant="caption" display="block" sx={{ mt: 1, color: '#ef4444' }}>
-              ⚠️ Single point of failure risk
-            </Typography>
-          )}
-        </Box>
-      }
-      arrow
-      placement="top"
-    >
-      <Box
-        sx={{
-          px: 2.5,
-          py: 1.5,
-          bgcolor: data.isHighlighted ? '#fef3c7' : isRisk ? '#fee2e2' : 'white',
-          border: `2px solid ${data.isHighlighted ? '#f59e0b' : isRisk ? '#ef4444' : '#e2e8f0'}`,
-          borderRadius: 3,
-          cursor: 'pointer',
-          transition: 'all 0.2s ease',
-          '&:hover': {
-            transform: 'scale(1.05)',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-          },
-        }}
-      >
-        <Handle type="target" position={Position.Top} style={{ opacity: 0 }} />
-        <Handle type="source" position={Position.Bottom} style={{ opacity: 0 }} />
-        
-        <Typography 
-          variant="body2" 
-          fontWeight={600}
-          sx={{ color: data.isHighlighted ? '#d97706' : isRisk ? '#dc2626' : '#1e293b' }}
-        >
-          {data.name}
-        </Typography>
-      </Box>
-    </Tooltip>
-  )
-}
-
-function SkillClusterNode({ data }: { data: SkillCluster }) {
-  return (
-    <Box
-      sx={{
-        width: 200,
-        p: 2,
-        bgcolor: data.color + '15',
-        border: `2px solid ${data.color}`,
-        borderRadius: 3,
-        textAlign: 'center',
-      }}
-    >
-      <Handle type="source" position={Position.Bottom} style={{ opacity: 0 }} />
-      
-      <Typography 
-        variant="body1" 
-        fontWeight="bold"
-        sx={{ color: data.color }}
-      >
-        {data.name}
-      </Typography>
-    </Box>
-  )
-}
-
 const nodeTypes = {
+  lob: LOBNode,
+  project: ProjectNode,
   employee: EmployeeNode,
-  skill: SkillNode,
-  cluster: SkillClusterNode,
 }
 
 // ============================================================================
@@ -285,148 +340,141 @@ const nodeTypes = {
 
 export default function EmployeeSkillNetworkPage() {
   const navigate = useNavigate()
-  const [selectedSkill, setSelectedSkill] = useState<string | null>(null)
+  const [selectedEmployee, setSelectedEmployee] = useState<EmployeeData | null>(null)
 
-  // Generate nodes with explicit positioning
+  // Generate nodes with explicit positioning for LOB → Project → Employee hierarchy
   const getInitialNodes = (): Node[] => {
     const nodes: Node[] = []
 
-    // 1. Skill Clusters at the top in a row
-    const clusterY = 50
-    const clusterSpacing = 350
-    mockSkillClusters.forEach((cluster, index) => {
+    // 1. LOBs at the top in a row
+    const lobY = 50
+    const lobSpacing = 400
+    mockLOBs.forEach((lob, index) => {
       nodes.push({
-        id: cluster.id,
-        type: 'cluster',
-        position: { x: 100 + index * clusterSpacing, y: clusterY },
-        data: cluster,
+        id: lob.id,
+        type: 'lob',
+        position: { x: 100 + index * lobSpacing, y: lobY },
+        data: lob,
       })
     })
 
-    // 2. Skills positioned under their clusters
-    const skillY = 180
-    const skillSpacing = 120
+    // 2. Projects in the middle, positioned under their LOBs
+    const projectY = 220
+    const projectSpacing = 130
     
-    // Backend skills
-    const backendSkills = mockSkills.filter((s) => s.clusterId === 'cluster-backend')
-    backendSkills.forEach((skill, index) => {
+    // ANS Projects
+    const ansProjects = mockProjects.filter((p) => p.lobId === 'lob-ans')
+    ansProjects.forEach((project, index) => {
       nodes.push({
-        id: skill.id,
-        type: 'skill',
+        id: project.id,
+        type: 'project',
         position: { 
-          x: 50 + index * skillSpacing, 
-          y: skillY 
+          x: 50 + index * projectSpacing, 
+          y: projectY 
         },
-        data: {
-          name: skill.name,
-          isHighlighted: selectedSkill === skill.name,
-          deepestExpert: getDeepestExpert(skill.id),
-        },
+        data: project,
       })
     })
 
-    // Frontend skills
-    const frontendSkills = mockSkills.filter((s) => s.clusterId === 'cluster-frontend')
-    frontendSkills.forEach((skill, index) => {
+    // IT Group Projects
+    const itProjects = mockProjects.filter((p) => p.lobId === 'lob-it')
+    itProjects.forEach((project, index) => {
       nodes.push({
-        id: skill.id,
-        type: 'skill',
+        id: project.id,
+        type: 'project',
         position: { 
-          x: 450 + index * skillSpacing, 
-          y: skillY 
+          x: 480 + index * projectSpacing, 
+          y: projectY 
         },
-        data: {
-          name: skill.name,
-          isHighlighted: selectedSkill === skill.name,
-          deepestExpert: getDeepestExpert(skill.id),
-        },
+        data: project,
       })
     })
 
-    // Cloud skills
-    const cloudSkills = mockSkills.filter((s) => s.clusterId === 'cluster-cloud')
-    cloudSkills.forEach((skill, index) => {
+    // MSS Projects
+    const mssProjects = mockProjects.filter((p) => p.lobId === 'lob-mss')
+    mssProjects.forEach((project, index) => {
       nodes.push({
-        id: skill.id,
-        type: 'skill',
+        id: project.id,
+        type: 'project',
         position: { 
-          x: 800 + index * skillSpacing, 
-          y: skillY 
+          x: 880 + index * projectSpacing, 
+          y: projectY 
         },
-        data: {
-          name: skill.name,
-          isHighlighted: selectedSkill === skill.name,
-          deepestExpert: getDeepestExpert(skill.id),
-        },
+        data: project,
       })
     })
 
-    // 3. Employees at the bottom in a grid (3 rows x 3 cols)
-    const employeeStartY = 400
-    const employeeSpacingX = 200
-    const employeeSpacingY = 120
-    mockEmployees.forEach((employee, index) => {
-      const row = Math.floor(index / 3)
-      const col = index % 3
-      nodes.push({
-        id: employee.id,
-        type: 'employee',
-        position: { 
-          x: 100 + col * employeeSpacingX * 2, 
-          y: employeeStartY + row * employeeSpacingY 
-        },
-        data: employee,
+    // 3. Employees at the bottom, distributed based on project assignments
+    const employeeStartY = 430
+    const employeeSpacingY = 130
+    
+    // Position employees under their projects
+    const positionedEmployees = new Set<string>()
+    let currentX = 50
+    
+    mockProjects.forEach((project) => {
+      const projectEmployeeIds = projectEmployees
+        .filter((pe) => pe.projectId === project.id)
+        .map((pe) => pe.employeeId)
+      
+      projectEmployeeIds.forEach((empId, empIndex) => {
+        if (!positionedEmployees.has(empId)) {
+          const employee = mockEmployees.find((e) => e.id === empId)
+          if (employee) {
+            nodes.push({
+              id: employee.id,
+              type: 'employee',
+              position: { 
+                x: currentX, 
+                y: employeeStartY + (empIndex * employeeSpacingY) 
+              },
+              data: employee,
+            })
+            positionedEmployees.add(empId)
+          }
+        }
+        currentX += 100
       })
     })
 
     return nodes
   }
 
-  // Generate edges
+  // Generate edges with curved lines
   const getInitialEdges = (): Edge[] => {
     const edges: Edge[] = []
 
-    // Skill → Cluster edges (light, neutral)
-    mockSkills.forEach((skill) => {
+    // LOB → Project edges (curved)
+    mockProjects.forEach((project) => {
+      const lob = mockLOBs.find((l) => l.id === project.lobId)
       edges.push({
-        id: `${skill.id}-${skill.clusterId}`,
-        source: skill.clusterId,
-        target: skill.id,
-        type: 'straight',
+        id: `${project.lobId}-${project.id}`,
+        source: project.lobId,
+        target: project.id,
+        type: 'smoothstep',
+        animated: false,
         style: {
-          stroke: '#cbd5e1',
-          strokeWidth: 1,
+          stroke: lob?.color || '#cbd5e1',
+          strokeWidth: 2,
         },
       })
     })
 
-    // Employee → Skill edges (colored by expertise)
-    employeeSkills.forEach((es) => {
-      const getEdgeColor = (level: number) => {
-        if (level >= 5) return '#22c55e' // Expert - Green
-        if (level >= 4) return '#84cc16' // Advanced - Light green
-        if (level >= 3) return '#f59e0b' // Intermediate - Orange
-        return '#94a3b8' // Junior - Gray
-      }
-
-      const isHighlighted = selectedSkill === mockSkills.find((s) => s.id === es.skillId)?.name
-
+    // Project → Employee edges (curved)
+    projectEmployees.forEach((pe) => {
+      const project = mockProjects.find((p) => p.id === pe.projectId)
+      const lob = mockLOBs.find((l) => l.id === project?.lobId)
+      
       edges.push({
-        id: `${es.employeeId}-${es.skillId}`,
-        source: es.skillId,
-        target: es.employeeId,
-        type: 'straight',
-        animated: isHighlighted,
+        id: `${pe.projectId}-${pe.employeeId}`,
+        source: pe.projectId,
+        target: pe.employeeId,
+        type: 'smoothstep',
+        animated: false,
         style: {
-          stroke: getEdgeColor(es.expertiseLevel),
-          strokeWidth: isHighlighted ? 3 : Math.max(1, es.expertiseLevel / 2),
+          stroke: lob?.color ? lob.color + '80' : '#94a3b8',
+          strokeWidth: 2,
         },
-        label: isHighlighted ? `Level ${es.expertiseLevel}` : undefined,
-        labelStyle: { fill: '#1e293b', fontWeight: 600, fontSize: 11 },
-        data: {
-          expertiseLevel: es.expertiseLevel,
-          confidenceScore: es.confidenceScore,
-        } as EmployeeSkillEdgeData,
       })
     })
 
@@ -453,36 +501,17 @@ export default function EmployeeSkillNetworkPage() {
 
   const onNodeClick = useCallback(
     (_: React.MouseEvent, node: Node) => {
-      if (node.type === 'skill') {
-        const skillData = node.data as SkillData
-        const newSelectedSkill = selectedSkill === skillData.name ? null : skillData.name
-        setSelectedSkill(newSelectedSkill)
-        
-        // Update nodes and edges
-        setNodes(getInitialNodes())
-        setEdges(getInitialEdges())
+      if (node.type === 'employee') {
+        const employeeData = node.data as EmployeeData
+        setSelectedEmployee(employeeData)
       }
     },
-    [selectedSkill]
+    []
   )
-
-  // Get employees connected to selected skill
-  const connectedEmployees = selectedSkill
-    ? employeeSkills
-        .filter((es) => mockSkills.find((s) => s.id === es.skillId)?.name === selectedSkill)
-        .map((es) => {
-          const emp = mockEmployees.find((e) => e.id === es.employeeId)
-          return { ...emp!, expertiseLevel: es.expertiseLevel }
-        })
-        .sort((a, b) => b.expertiseLevel - a.expertiseLevel)
-    : []
 
   // Calculate statistics
-  const awsExperts = employeeSkills.filter((es) => es.skillId === 'skill-aws')
-  const deepAWSExpert = awsExperts.sort((a, b) => b.expertiseLevel - a.expertiseLevel)[0]
-  const riskSkills = mockSkills.filter((skill) => 
-    employeeSkills.filter((es) => es.skillId === skill.id).length === 1
-  )
+  const totalProjects = mockProjects.length
+  const totalEmployees = mockEmployees.length
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
@@ -497,10 +526,10 @@ export default function EmployeeSkillNetworkPage() {
           </IconButton>
           <Box>
             <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
-              Team Skill Network
+              Project Organization Hierarchy
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              Capability distribution and skill relationships across {mockEmployees.length} employees
+              LOB → Projects → Employees across {totalProjects} active projects
             </Typography>
           </Box>
         </Box>
@@ -517,71 +546,49 @@ export default function EmployeeSkillNetworkPage() {
             <Box sx={{ display: 'flex', gap: 3 }}>
               <Box>
                 <Typography variant="caption" color="text.secondary">
-                  Total Employees
+                  Lines of Business
                 </Typography>
                 <Typography variant="body1" fontWeight={600}>
-                  {mockEmployees.length}
+                  {mockLOBs.length}
                 </Typography>
               </Box>
               <Box>
                 <Typography variant="caption" color="text.secondary">
-                  Total Skills
+                  Active Projects
                 </Typography>
                 <Typography variant="body1" fontWeight={600}>
-                  {mockSkills.length}
+                  {totalProjects}
                 </Typography>
               </Box>
               <Box>
                 <Typography variant="caption" color="text.secondary">
-                  AWS Experts
+                  Team Members
                 </Typography>
-                <Typography variant="body1" fontWeight={600} color="success.main">
-                  {awsExperts.length}
-                </Typography>
-              </Box>
-              <Box>
-                <Typography variant="caption" color="text.secondary">
-                  Risk Skills
-                </Typography>
-                <Typography variant="body1" fontWeight={600} color="error.main">
-                  {riskSkills.length}
+                <Typography variant="body1" fontWeight={600}>
+                  {totalEmployees}
                 </Typography>
               </Box>
             </Box>
-            {deepAWSExpert && (
-              <Box>
-                <Typography variant="caption" color="text.secondary">
-                  Deep AWS Expert
-                </Typography>
-                <Chip 
-                  label={mockEmployees.find((e) => e.id === deepAWSExpert.employeeId)?.name}
-                  size="small"
-                  sx={{ bgcolor: 'success.50', color: 'success.main', fontWeight: 600 }}
-                />
-              </Box>
-            )}
-          </Box>
-          {selectedSkill && (
-            <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid #e2e8f0' }}>
+            <Box>
               <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
-                Selected: <strong>{selectedSkill}</strong>
+                💡 Click on an employee to view their skills
               </Typography>
               <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                {connectedEmployees.map((emp) => (
+                {mockLOBs.map((lob) => (
                   <Chip
-                    key={emp.id}
-                    label={`${emp.name} (L${emp.expertiseLevel})`}
+                    key={lob.id}
+                    label={lob.name}
                     size="small"
                     sx={{ 
-                      bgcolor: emp.expertiseLevel >= 5 ? 'success.50' : 'primary.50',
-                      color: emp.expertiseLevel >= 5 ? 'success.main' : 'primary.main',
-                      fontWeight: 500
+                      bgcolor: lob.color + '20',
+                      color: lob.color,
+                      fontWeight: 600
                     }}
                   />
                 ))}
               </Box>
             </Box>
-          )}
+          </Box>
         </Paper>
       </motion.div>
 
@@ -622,34 +629,94 @@ export default function EmployeeSkillNetworkPage() {
             Legend
           </Typography>
           <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', alignItems: 'center' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Box sx={{ width: 12, height: 12, bgcolor: '#22c55e', borderRadius: '50%' }} />
-              <Typography variant="caption">Expert (Level 5)</Typography>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Box sx={{ width: 12, height: 12, bgcolor: '#84cc16', borderRadius: '50%' }} />
-              <Typography variant="caption">Advanced (Level 4)</Typography>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Box sx={{ width: 12, height: 12, bgcolor: '#f59e0b', borderRadius: '50%' }} />
-              <Typography variant="caption">Intermediate (Level 3)</Typography>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Box sx={{ width: 12, height: 12, bgcolor: '#94a3b8', borderRadius: '50%' }} />
-              <Typography variant="caption">Junior (Level 1-2)</Typography>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Box sx={{ width: 16, height: 16, bgcolor: '#fee2e2', border: '2px solid #ef4444', borderRadius: 1 }} />
-              <Typography variant="caption" color="error.main">⚠️ Risk: Single Owner</Typography>
-            </Box>
+            {mockLOBs.map((lob) => (
+              <Box key={lob.id} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box sx={{ width: 16, height: 16, bgcolor: lob.color, borderRadius: '4px' }} />
+                <Typography variant="caption">{lob.name}</Typography>
+              </Box>
+            ))}
           </Box>
           <Box sx={{ mt: 1.5, pt: 1.5, borderTop: '1px solid #e2e8f0' }}>
             <Typography variant="caption" color="text.secondary">
-              💡 Click on a skill to highlight all employees with that skill • Hover over skills for AI insights
+              💡 Click on an employee to view their skills and expertise
             </Typography>
           </Box>
         </Paper>
       </motion.div>
+
+      {/* Employee Skills Modal */}
+      <Dialog
+        open={!!selectedEmployee}
+        onClose={() => setSelectedEmployee(null)}
+        maxWidth="sm"
+        fullWidth
+      >
+        {selectedEmployee && (
+          <>
+            <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Box>
+                <Typography variant="h6" fontWeight="bold">
+                  {selectedEmployee.name}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {selectedEmployee.role}
+                </Typography>
+              </Box>
+              <IconButton onClick={() => setSelectedEmployee(null)} size="small">
+                <X size={20} />
+              </IconButton>
+            </DialogTitle>
+            <DialogContent>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                  Skills & Expertise
+                </Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+                  {selectedEmployee.skills.map((skill, idx) => {
+                    const getSkillColor = (level: number) => {
+                      if (level >= 5) return { bg: '#dcfce7', color: '#16a34a', label: 'Expert' }
+                      if (level >= 4) return { bg: '#dbeafe', color: '#2563eb', label: 'Advanced' }
+                      if (level >= 3) return { bg: '#fef3c7', color: '#d97706', label: 'Intermediate' }
+                      return { bg: '#f1f5f9', color: '#64748b', label: 'Junior' }
+                    }
+                    const skillStyle = getSkillColor(skill.level)
+                    
+                    return (
+                      <Box key={idx} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Typography variant="body2" fontWeight={500}>
+                          {skill.name}
+                        </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Chip
+                            label={`Level ${skill.level}`}
+                            size="small"
+                            sx={{
+                              bgcolor: skillStyle.bg,
+                              color: skillStyle.color,
+                              fontWeight: 600,
+                              fontSize: '0.75rem',
+                            }}
+                          />
+                          <Chip
+                            label={skillStyle.label}
+                            size="small"
+                            sx={{
+                              bgcolor: skillStyle.bg,
+                              color: skillStyle.color,
+                              fontWeight: 500,
+                              fontSize: '0.7rem',
+                            }}
+                          />
+                        </Box>
+                      </Box>
+                    )
+                  })}
+                </Box>
+              </Box>
+            </DialogContent>
+          </>
+        )}
+      </Dialog>
     </Container>
   )
 }
