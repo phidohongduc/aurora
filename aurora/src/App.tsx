@@ -2,13 +2,14 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material'
 import { FloatingDock, type DockItem } from '@/components/ui'
 import { AICompanion } from '@/components/AICompanion'
-import { Home, Briefcase, PlusCircle } from 'lucide-react'
+import { Home, Briefcase, PlusCircle, Users } from 'lucide-react'
 import {
   MainPage,
   JobListPage,
   CreateJobPage,
   JobDetailPage,
   UploadCVPage,
+  EmployeesPage,
 } from '@/pages'
 
 const theme = createTheme({
@@ -90,6 +91,11 @@ const navigationItems: DockItem[] = [
     icon: <PlusCircle className="w-full h-full text-gray-600" strokeWidth={1.5} />,
     href: '/jobs/new',
   },
+  {
+    title: 'Employees',
+    icon: <Users className="w-full h-full text-gray-600" strokeWidth={1.5} />,
+    href: '/employees',
+  },
 ]
 
 function App() {
@@ -105,6 +111,7 @@ function App() {
               <Route path="/jobs/new" element={<CreateJobPage />} />
               <Route path="/jobs/:id" element={<JobDetailPage />} />
               <Route path="/jobs/:id/upload" element={<UploadCVPage />} />
+              <Route path="/employees" element={<EmployeesPage />} />
             </Routes>
           </main>
           <div className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2">
