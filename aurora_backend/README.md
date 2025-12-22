@@ -38,7 +38,7 @@ Generate job requisition data using AI based on a natural language prompt.
 **Request Body**:
 ```json
 {
-  "prompt": "We need a Senior Backend Engineer for our engineering team, experienced with Python and FastAPI, 5-10 years experience, remote position, salary around $120k-$180k",
+  "prompt": "We need a Senior Backend Engineer for our engineering team, experienced with Python and FastAPI, 5-10 years experience, remote position. Should handle microservices and API design.",
   "markConfidential": true
 }
 ```
@@ -57,8 +57,7 @@ Generate job requisition data using AI based on a natural language prompt.
     "targetYearsMax": 10,
     "requiredSkills": ["Python", "FastAPI", "RESTful APIs", "Database Design"],
     "niceToHaveSkills": ["Docker", "Kubernetes", "AWS"],
-    "salaryMin": 120000,
-    "salaryMax": 180000
+    "description": "<h2>Job Overview</h2><p>We are seeking a <strong>Senior Backend Engineer</strong> to join our engineering team...</p><h2>Key Responsibilities</h2><ul><li>Design and develop microservices</li><li>Build RESTful APIs</li></ul>"
   },
   "message": "Job requisition data generated successfully"
 }
@@ -69,7 +68,7 @@ Generate job requisition data using AI based on a natural language prompt.
 curl -X POST "http://localhost:8000/fill-job-requisition" \
   -H "Content-Type: application/json" \
   -d '{
-    "prompt": "Senior Frontend Developer, React expert, 3-7 years, hybrid in San Francisco, $100k-$150k",
+    "prompt": "Senior Frontend Developer, React expert, 3-7 years, hybrid work",
     "markConfidential": true
   }'
 ```
@@ -81,7 +80,7 @@ import requests
 response = requests.post(
     "http://localhost:8000/fill-job-requisition",
     json={
-        "prompt": "Junior Data Scientist, machine learning background, 1-3 years, onsite in Boston",
+        "prompt": "Junior Data Scientist, machine learning background, 1-3 years, onsite",
         "markConfidential": True
     }
 )
@@ -97,12 +96,13 @@ The AI generates the following fields:
 - **location**: "Remote" | "Hybrid" | "Onsite"
 - **employmentType**: "Full-time" | "Part-time" | "Contract"
 - **hiringManager**: Hiring manager name
-- **targetYearsMin**: Minimum years of experience (optional)
-- **targetYearsMax**: Maximum years of experience (optional)
+- **targetYearsMin**: Minimum years of experience (required)
+- **targetYearsMax**: Maximum years of experience (required)
 - **requiredSkills**: Array of required skills
 - **niceToHaveSkills**: Array of nice-to-have skills
-- **salaryMin**: Minimum salary (optional)
-- **salaryMax**: Maximum salary (optional)
+- **description**: HTML formatted job description with rich text styling (headings, bold, italic, lists, etc.)
+
+**Note**: Salary information is intentionally excluded from the API response.
 
 ## Development
 

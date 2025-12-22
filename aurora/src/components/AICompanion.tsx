@@ -30,15 +30,15 @@ export function AICompanion() {
     
     if (path === '/jobs/new') {
       setSuggestions([
-        { id: 's1', text: 'Generate job description from title' },
-        { id: 's2', text: 'Suggest required skills' },
-        { id: 's3', text: 'Recommend years of experience' },
+        { id: 's1', text: 'Fill form for Data Engineer position' },
+        { id: 's2', text: 'Generate Senior Frontend Developer job' },
+        { id: 's3', text: 'Create Backend Engineer requisition' },
       ])
       setMessages([
         {
           id: 'm1',
           role: 'assistant',
-          content: "Hi! 👋 I'm your AI hiring assistant. I can help you create a compelling job requisition. What position are you hiring for?",
+          content: "Hi! 👋 I'm your AI hiring assistant. I can help you create a compelling job requisition. Try asking me:\n\n'Fill in the form for Senior Data Engineer, 5-7 years experience, must know Python and SQL'\n\nor click one of the suggestions above!",
           timestamp: new Date(),
         },
       ])
@@ -98,7 +98,7 @@ export function AICompanion() {
     }
   }, [location.pathname])
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!input.trim()) return
 
     const userMessage: Message = {
@@ -109,21 +109,78 @@ export function AICompanion() {
     }
 
     setMessages([...messages, userMessage])
+    const userInput = input
     setInput('')
 
-    // Simulate AI response
-    setTimeout(() => {
-      const aiResponse: Message = {
-        id: `msg-${Date.now()}-ai`,
+    // Check if we're on the create job page and user is asking to fill the form
+    if (location.pathname === '/jobs/new' && 
+        (userInput.toLowerCase().includes('fill') || 
+         userInput.toLowerCase().includes('create') ||
+         userInput.toLowerCase().includes('generate'))) {
+      
+      // Show loading message
+      const loadingMessage: Message = {
+        id: `msg-${Date.now()}-loading`,
         role: 'assistant',
-        content: "I'm analyzing your request... This is a demo response. In a real implementation, this would be powered by an AI model to provide contextual assistance.",
+        content: "🔄 Generating job requisition data based on your request...",
         timestamp: new Date(),
       }
-      setMessages(prev => [...prev, aiResponse])
-    }, 1000)
+      setMessages(prev => [...prev, loadingMessage])
+
+      try {
+        // Call the backend API
+        const response = await fetch('http://localhost:8000/fill-job-requisition', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            prompt: userInput,
+            markConfidential: false,
+          }),
+        })
+
+        const result = await response.json()
+
+        if (result.success && result.data) {
+          // Dispatch custom event to fill the form
+          const event = new CustomEvent('fillJobForm', { detail: result.data })
+          window.dispatchEvent(event)
+
+          // Show success message
+          setMessages(prev => prev.filter(m => m.id !== loadingMessage.id).concat({
+            id: `msg-${Date.now()}-ai`,
+            role: 'assistant',
+            content: `✅ Great! I've filled in the form for "${result.data.title}". The form will be populated with:\n\n• Department: ${result.data.department}\n• Location: ${result.data.location}\n• Years: ${result.data.targetYearsMin}-${result.data.targetYearsMax}\n• Required Skills: ${result.data.requiredSkills.join(', ')}\n${result.data.description ? `\n📝 Rich HTML job description has been added!` : ''}\n\nFeel free to adjust any fields before submitting!`,
+            timestamp: new Date(),
+          }))
+        } else {
+          throw new Error(result.message || 'Failed to generate job data')
+        }
+      } catch (error) {
+        // Show error message
+        setMessages(prev => prev.filter(m => m.id !== loadingMessage.id).concat({
+          id: `msg-${Date.now()}-ai`,
+          role: 'assistant',
+          content: `❌ Sorry, I couldn't generate the job data. Error: ${error instanceof Error ? error.message : 'Unknown error'}. Please make sure the backend is running on http://localhost:8000`,
+          timestamp: new Date(),
+        }))
+      }
+    } else {
+      // Simulate AI response for other queries
+      setTimeout(() => {
+        const aiResponse: Message = {
+          id: `msg-${Date.now()}-ai`,
+          role: 'assistant',
+          content: "I'm analyzing your request... This is a demo response. In a real implementation, this would be powered by an AI model to provide contextual assistance.",
+          timestamp: new Date(),
+        }
+        setMessages(prev => [...prev, aiResponse])
+      }, 1000)
+    }
   }
 
-  const handleSuggestionClick = (suggestion: Suggestion) => {
+  const handleSuggestionClick = async (suggestion: Suggestion) => {
     const userMessage: Message = {
       id: `msg-${Date.now()}`,
       role: 'user',
@@ -133,16 +190,68 @@ export function AICompanion() {
 
     setMessages([...messages, userMessage])
 
-    // Simulate AI response based on suggestion
-    setTimeout(() => {
-      const aiResponse: Message = {
-        id: `msg-${Date.now()}-ai`,
+    // Check if this is a job generation suggestion on create job page
+    if (location.pathname === '/jobs/new') {
+      // Show loading message
+      const loadingMessage: Message = {
+        id: `msg-${Date.now()}-loading`,
         role: 'assistant',
-        content: `Great question! ${suggestion.text} - I can help with that. This is a demo response showing contextual AI assistance.`,
+        content: "🔄 Generating job requisition data based on your request...",
         timestamp: new Date(),
       }
-      setMessages(prev => [...prev, aiResponse])
-    }, 1000)
+      setMessages(prev => [...prev, loadingMessage])
+
+      try {
+        // Call the backend API
+        const response = await fetch('http://localhost:8000/fill-job-requisition', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            prompt: suggestion.text,
+            markConfidential: false,
+          }),
+        })
+
+        const result = await response.json()
+
+        if (result.success && result.data) {
+          // Dispatch custom event to fill the form
+          const event = new CustomEvent('fillJobForm', { detail: result.data })
+          window.dispatchEvent(event)
+
+          // Show success message
+          setMessages(prev => prev.filter(m => m.id !== loadingMessage.id).concat({
+            id: `msg-${Date.now()}-ai`,
+            role: 'assistant',
+            content: `✅ Great! I've filled in the form for "${result.data.title}". The form will be populated with:\n\n• Department: ${result.data.department}\n• Location: ${result.data.location}\n• Years: ${result.data.targetYearsMin}-${result.data.targetYearsMax}\n• Required Skills: ${result.data.requiredSkills.join(', ')}\n${result.data.description ? `\n📝 Rich HTML job description has been added!` : ''}\n\nFeel free to adjust any fields before submitting!`,
+            timestamp: new Date(),
+          }))
+        } else {
+          throw new Error(result.message || 'Failed to generate job data')
+        }
+      } catch (error) {
+        // Show error message
+        setMessages(prev => prev.filter(m => m.id !== loadingMessage.id).concat({
+          id: `msg-${Date.now()}-ai`,
+          role: 'assistant',
+          content: `❌ Sorry, I couldn't generate the job data. Error: ${error instanceof Error ? error.message : 'Unknown error'}. Please make sure the backend is running on http://localhost:8000`,
+          timestamp: new Date(),
+        }))
+      }
+    } else {
+      // Simulate AI response based on suggestion
+      setTimeout(() => {
+        const aiResponse: Message = {
+          id: `msg-${Date.now()}-ai`,
+          role: 'assistant',
+          content: `Great question! ${suggestion.text} - I can help with that. This is a demo response showing contextual AI assistance.`,
+          timestamp: new Date(),
+        }
+        setMessages(prev => [...prev, aiResponse])
+      }, 1000)
+    }
   }
 
   if (!isOpen) {
@@ -343,10 +452,11 @@ export function AICompanion() {
 
         {/* Input */}
         <Box sx={{ p: 2, borderTop: '1px solid #E2E8F0' }}>
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box sx={{ position: 'relative' }}>
             <TextField
               fullWidth
-              size="small"
+              multiline
+              maxRows={6}
               placeholder="Ask me anything..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -359,6 +469,8 @@ export function AICompanion() {
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2,
+                  paddingRight: '48px',
+                  paddingBottom: '12px',
                 },
               }}
             />
@@ -366,13 +478,18 @@ export function AICompanion() {
               onClick={handleSendMessage}
               disabled={!input.trim()}
               sx={{
+                position: 'absolute',
+                right: 8,
+                bottom: 8,
                 bgcolor: '#4F46E5',
                 color: 'white',
+                width: 32,
+                height: 32,
                 '&:hover': { bgcolor: '#4338CA' },
                 '&:disabled': { bgcolor: '#E2E8F0', color: '#94A3B8' },
               }}
             >
-              <Send size={18} />
+              <Send size={16} />
             </IconButton>
           </Box>
         </Box>

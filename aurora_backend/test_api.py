@@ -9,7 +9,7 @@ def test_fill_job_requisition():
     
     # Test data
     payload = {
-        "prompt": "We need a Senior Backend Engineer for our engineering team, experienced with Python and FastAPI, 5-10 years experience, remote position, salary around $120k-$180k",
+        "prompt": "We need a Senior Backend Engineer for our engineering team, experienced with Python and FastAPI, 5-10 years experience, remote position. Should handle microservices architecture and API design.",
         "markConfidential": True
     }
     

@@ -41,12 +41,11 @@ class JobRequisitionData(BaseModel):
     location: LocationType
     employmentType: EmploymentType
     hiringManager: str
-    targetYearsMin: Optional[int] = None
-    targetYearsMax: Optional[int] = None
+    targetYearsMin: int
+    targetYearsMax: int
     requiredSkills: List[str] = []
     niceToHaveSkills: List[str] = []
-    salaryMin: Optional[int] = None
-    salaryMax: Optional[int] = None
+    description: str  # HTML/Markdown formatted description
 
 
 class FillJobRequisitionResponse(BaseModel):
@@ -78,18 +77,19 @@ Return ONLY a valid JSON object with the following structure:
   "location": "Remote" | "Hybrid" | "Onsite",
   "employmentType": "Full-time" | "Part-time" | "Contract",
   "hiringManager": "Manager name",
-  "targetYearsMin": number or null,
-  "targetYearsMax": number or null,
+  "targetYearsMin": number (required, must be a positive integer),
+  "targetYearsMax": number (required, must be a positive integer),
   "requiredSkills": ["skill1", "skill2"],
   "niceToHaveSkills": ["skill1", "skill2"],
-  "salaryMin": number or null,
-  "salaryMax": number or null
+  "description": "HTML formatted job description with <p>, <strong>, <em>, <h1>, <h2>, <ul>, <ol>, <li> tags for rich text"
 }
 
 Important:
-- All fields must be present
+- All fields must be present and targetYearsMin/Max must always have values
+- DO NOT include any salary information
 - Use realistic and professional values
-- Infer reasonable values based on the job description
+- For description, use HTML formatting with proper tags for headings, paragraphs, bold, italic, lists etc.
+- Make the description comprehensive with responsibilities, requirements, and benefits sections
 - Return ONLY the JSON, no additional text or explanation"""
         else:
             system_prompt = """You are an AI assistant helping to fill out job requisition forms. 
@@ -102,18 +102,19 @@ Return ONLY a valid JSON object with the following structure:
   "location": "Remote" | "Hybrid" | "Onsite",
   "employmentType": "Full-time" | "Part-time" | "Contract",
   "hiringManager": "Manager name",
-  "targetYearsMin": number or null,
-  "targetYearsMax": number or null,
+  "targetYearsMin": number (required, must be a positive integer),
+  "targetYearsMax": number (required, must be a positive integer),
   "requiredSkills": ["skill1", "skill2"],
   "niceToHaveSkills": ["skill1", "skill2"],
-  "salaryMin": number or null,
-  "salaryMax": number or null
+  "description": "HTML formatted job description with <p>, <strong>, <em>, <h1>, <h2>, <ul>, <ol>, <li> tags for rich text"
 }
 
 Important:
-- All fields must be present
+- All fields must be present and targetYearsMin/Max must always have values
+- DO NOT include any salary information
 - Use realistic and professional values
-- Infer reasonable values based on the job description
+- For description, use HTML formatting with proper tags for headings, paragraphs, bold, italic, lists etc.
+- Make the description comprehensive with responsibilities, requirements, and benefits sections
 - Return ONLY the JSON, no additional text or explanation"""
 
         # Call OpenAI API
