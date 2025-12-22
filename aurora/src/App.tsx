@@ -1,10 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material'
 import { FloatingDock, type DockItem } from '@/components/ui'
-import HomeIcon from '@mui/icons-material/Home'
-import WorkIcon from '@mui/icons-material/Work'
-import AddCircleIcon from '@mui/icons-material/AddCircle'
-import UploadFileIcon from '@mui/icons-material/UploadFile'
+import { Home, Briefcase, PlusCircle, Upload } from 'lucide-react'
 import {
   MainPage,
   JobListPage,
@@ -16,28 +13,85 @@ import {
 const theme = createTheme({
   palette: {
     mode: 'light',
+    background: {
+      default: '#F8FAFC',
+      paper: '#FFFFFF',
+    },
+  },
+  shape: {
+    borderRadius: 16,
+  },
+  components: {
+    MuiPaper: {
+      defaultProps: {
+        variant: 'outlined',
+      },
+      styleOverrides: {
+        root: {
+          borderRadius: 16,
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 16,
+          textTransform: 'none',
+        },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          borderRadius: 16,
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-root': {
+            borderRadius: 16,
+          },
+        },
+      },
+    },
+    MuiAlert: {
+      styleOverrides: {
+        root: {
+          borderRadius: 16,
+        },
+      },
+    },
+    MuiTableContainer: {
+      styleOverrides: {
+        root: {
+          borderRadius: 16,
+        },
+      },
+    },
   },
 })
 
 const navigationItems: DockItem[] = [
   {
     title: 'Home',
-    icon: <HomeIcon sx={{ width: '100%', height: '100%', color: 'grey.600' }} />,
+    icon: <Home className="w-full h-full text-gray-600" strokeWidth={1.5} />,
     href: '/',
   },
   {
     title: 'Job Requisitions',
-    icon: <WorkIcon sx={{ width: '100%', height: '100%', color: 'grey.600' }} />,
+    icon: <Briefcase className="w-full h-full text-gray-600" strokeWidth={1.5} />,
     href: '/jobs',
   },
   {
     title: 'Create Job',
-    icon: <AddCircleIcon sx={{ width: '100%', height: '100%', color: 'grey.600' }} />,
+    icon: <PlusCircle className="w-full h-full text-gray-600" strokeWidth={1.5} />,
     href: '/jobs/new',
   },
   {
     title: 'Upload CVs',
-    icon: <UploadFileIcon sx={{ width: '100%', height: '100%', color: 'grey.600' }} />,
+    icon: <Upload className="w-full h-full text-gray-600" strokeWidth={1.5} />,
     href: '/jobs/1/upload',
   },
 ]
