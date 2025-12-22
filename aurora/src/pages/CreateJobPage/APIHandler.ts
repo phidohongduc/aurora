@@ -17,7 +17,15 @@ export async function createJob(
     id: String(nextId++),
     title: request.title,
     department: request.department,
-    description: request.description,
+    location: request.location,
+    employmentType: request.employmentType,
+    hiringManager: request.hiringManager,
+    targetYearsMin: request.targetYearsMin,
+    targetYearsMax: request.targetYearsMax,
+    requiredSkills: request.requiredSkills,
+    niceToHaveSkills: request.niceToHaveSkills,
+    salaryMin: request.salaryMin,
+    salaryMax: request.salaryMax,
     status: 'open',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -44,6 +52,18 @@ export const mockDepartments = [
   'Customer Success',
 ]
 
+// Mock hiring managers
+export const mockHiringManagers = [
+  'Sarah Johnson',
+  'Michael Chen',
+  'Emily Davis',
+  'David Kim',
+  'Jessica Williams',
+  'Robert Brown',
+  'Amanda Martinez',
+  'James Wilson',
+]
+
 export async function getDepartments(): Promise<ApiResponse<string[]>> {
   await simulateDelay()
 
@@ -51,5 +71,15 @@ export async function getDepartments(): Promise<ApiResponse<string[]>> {
     data: mockDepartments,
     success: true,
     message: 'Departments fetched successfully',
+  }
+}
+
+export async function getHiringManagers(): Promise<ApiResponse<string[]>> {
+  await simulateDelay()
+
+  return {
+    data: mockHiringManagers,
+    success: true,
+    message: 'Hiring managers fetched successfully',
   }
 }

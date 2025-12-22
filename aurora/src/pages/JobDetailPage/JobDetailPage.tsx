@@ -11,10 +11,15 @@ import {
   Divider,
   CircularProgress,
   Alert,
+  Grid,
 } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import UploadFileIcon from '@mui/icons-material/UploadFile'
 import EditIcon from '@mui/icons-material/Edit'
+import WorkIcon from '@mui/icons-material/Work'
+import LocationOnIcon from '@mui/icons-material/LocationOn'
+import PeopleIcon from '@mui/icons-material/People'
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney'
 import type { JobRequisition, CV } from '@/types'
 import { getJobDetail, getJobCVs } from './APIHandler'
 
@@ -62,6 +67,22 @@ export default function JobDetailPage() {
     })
   }
 
+  const formatSalary = (min?: number, max?: number) => {
+    if (!min && !max) return 'Not specified'
+    if (min && max) return `$${min.toLocaleString()} - $${max.toLocaleString()}`
+    if (min) return `From $${min.toLocaleString()}`
+    if (max) return `Up to $${max.toLocaleString()}`
+    return 'Not specified'
+  }
+
+  const formatExperience = (min?: number, max?: number) => {
+    if (!min && !max) return 'Not specified'
+    if (min && max) return `${min} - ${max} years`
+    if (min) return `${min}+ years`
+    if (max) return `Up to ${max} years`
+    return 'Not specified'
+  }
+
   const getStatusColor = (status: JobRequisition['status']) => {
     switch (status) {
       case 'open':
@@ -102,7 +123,7 @@ export default function JobDetailPage() {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="md" sx={{ py: 4 }}>
       <Button
         component={Link}
         to="/jobs"
@@ -111,7 +132,9 @@ export default function JobDetailPage() {
       >
         Back to Jobs
       </Button>
+
       <Paper sx={{ p: 4 }}>
+        {/* Header */}
         <Box
           sx={{
             display: 'flex',
@@ -120,41 +143,158 @@ export default function JobDetailPage() {
             mb: 3,
           }}
         >
-          <Typography variant="h4" component="h1" fontWeight="bold">
-            {job.title}
-          </Typography>
+          <Box>
+            <Typography variant="h4" component="h1" fontWeight="bold">
+              {job.title}
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5 }}>
+              {job.department} • {job.location} • {job.employmentType}
+            </Typography>
+          </Box>
           <Chip
             label={job.status.charAt(0).toUpperCase() + job.status.slice(1)}
             color={getStatusColor(job.status)}
           />
         </Box>
-        <Divider sx={{ mb: 3 }} />
-        <Stack spacing={2} sx={{ mb: 4 }}>
-          <Box>
-            <Typography variant="body2" color="text.secondary">
-              Department
+
+        <Divider sx={{ my: 3 }} />
+
+        {/* Basic Information */}
+        <Box sx={{ mb: 4 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+            <WorkIcon sx={{ color: 'primary.main' }} />
+            <Typography variant="h6" fontWeight="600">
+              Basic Information
             </Typography>
-            <Typography variant="body1">{job.department}</Typography>
           </Box>
-          <Box>
-            <Typography variant="body2" color="text.secondary">
-              Created
+          <Grid container spacing={3}>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Typography variant="body2" color="text.secondary">
+                Department
+              </Typography>
+              <Typography variant="body1">{job.department}</Typography>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Typography variant="body2" color="text.secondary">
+                Hiring Manager
+              </Typography>
+              <Typography variant="body1">{job.hiringManager}</Typography>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <LocationOnIcon fontSize="small" /> Location
+              </Typography>
+              <Typography variant="body1">{job.location}</Typography>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Typography variant="body2" color="text.secondary">
+                Employment Type
+              </Typography>
+              <Typography variant="body1">{job.employmentType}</Typography>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Typography variant="body2" color="text.secondary">
+                Created
+              </Typography>
+              <Typography variant="body1">{formatDate(job.createdAt)}</Typography>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Typography variant="body2" color="text.secondary">
+                CVs Received
+              </Typography>
+              <Typography variant="body1">{cvs.length} candidates</Typography>
+            </Grid>
+          </Grid>
+        </Box>
+
+        <Divider sx={{ my: 3 }} />
+
+        {/* Experience & Skills */}
+        <Box sx={{ mb: 4 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+            <PeopleIcon sx={{ color: 'primary.main' }} />
+            <Typography variant="h6" fontWeight="600">
+              Experience & Skills
             </Typography>
-            <Typography variant="body1">{formatDate(job.createdAt)}</Typography>
           </Box>
-          <Box>
-            <Typography variant="body2" color="text.secondary">
-              CVs Received
+          <Grid container spacing={3}>
+            <Grid size={12}>
+              <Typography variant="body2" color="text.secondary">
+                Target Experience
+              </Typography>
+              <Typography variant="body1">
+                {formatExperience(job.targetYearsMin, job.targetYearsMax)}
+              </Typography>
+            </Grid>
+            <Grid size={12}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                Required Skills
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                {job.requiredSkills.length > 0 ? (
+                  job.requiredSkills.map((skill, index) => (
+                    <Chip
+                      key={index}
+                      label={skill}
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                      sx={{ bgcolor: 'primary.50' }}
+                    />
+                  ))
+                ) : (
+                  <Typography variant="body2" color="text.secondary">
+                    No required skills specified
+                  </Typography>
+                )}
+              </Box>
+            </Grid>
+            <Grid size={12}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                Nice-to-have Skills
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                {job.niceToHaveSkills.length > 0 ? (
+                  job.niceToHaveSkills.map((skill, index) => (
+                    <Chip
+                      key={index}
+                      label={skill}
+                      size="small"
+                      variant="outlined"
+                      sx={{ bgcolor: 'grey.100' }}
+                    />
+                  ))
+                ) : (
+                  <Typography variant="body2" color="text.secondary">
+                    No nice-to-have skills specified
+                  </Typography>
+                )}
+              </Box>
+            </Grid>
+          </Grid>
+        </Box>
+
+        <Divider sx={{ my: 3 }} />
+
+        {/* Compensation */}
+        <Box sx={{ mb: 4 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+            <AttachMoneyIcon sx={{ color: 'primary.main' }} />
+            <Typography variant="h6" fontWeight="600">
+              Compensation
             </Typography>
-            <Typography variant="body1">{cvs.length} candidates</Typography>
           </Box>
-          <Box>
-            <Typography variant="body2" color="text.secondary">
-              Description
-            </Typography>
-            <Typography variant="body1">{job.description}</Typography>
-          </Box>
-        </Stack>
+          <Typography variant="body2" color="text.secondary">
+            Salary Range
+          </Typography>
+          <Typography variant="body1">
+            {formatSalary(job.salaryMin, job.salaryMax)}
+          </Typography>
+        </Box>
+
+        <Divider sx={{ my: 3 }} />
+
+        {/* Actions */}
         <Stack direction="row" spacing={2}>
           <Button
             component={Link}

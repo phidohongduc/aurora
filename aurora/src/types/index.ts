@@ -1,9 +1,20 @@
 // Job Requisition Types
+export type LocationType = 'Remote' | 'Hybrid' | 'Onsite'
+export type EmploymentType = 'Full-time' | 'Part-time' | 'Contract'
+
 export interface JobRequisition {
   id: string
   title: string
   department: string
-  description: string
+  location: LocationType
+  employmentType: EmploymentType
+  hiringManager: string
+  targetYearsMin?: number
+  targetYearsMax?: number
+  requiredSkills: string[]
+  niceToHaveSkills: string[]
+  salaryMin?: number
+  salaryMax?: number
   status: 'open' | 'closed' | 'draft'
   createdAt: string
   updatedAt: string
@@ -12,7 +23,15 @@ export interface JobRequisition {
 export interface CreateJobRequisitionRequest {
   title: string
   department: string
-  description: string
+  location: LocationType
+  employmentType: EmploymentType
+  hiringManager: string
+  targetYearsMin?: number
+  targetYearsMax?: number
+  requiredSkills: string[]
+  niceToHaveSkills: string[]
+  salaryMin?: number
+  salaryMax?: number
 }
 
 export interface CV {
