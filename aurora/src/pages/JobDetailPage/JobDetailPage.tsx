@@ -23,9 +23,131 @@ import {
   Clock,
   ChevronRight,
   User,
+  Award,
+  TrendingUp,
+  GraduationCap,
+  Building2,
+  Cloud,
+  Network,
+  CheckCircle2,
+  XCircle,
+  Check,
+  MessageSquare,
 } from 'lucide-react'
-import type { JobRequisition, CV } from '@/types'
+import type { JobRequisition, CV, PipelineStep, InterviewQuestion } from '@/types'
 import { getJobDetail, getJobCVs } from './APIHandler'
+import { CandidateScreeningView } from './CandidateScreeningView'
+import { CandidateInterviewingView } from './CandidateInterviewingView'
+import { CandidateOfferView } from './CandidateOfferView'
+import { CandidateHiredView } from './CandidateHiredView'
+
+// Pipeline Stepper Component
+const steps: { key: PipelineStep; label: string }[] = [
+  { key: 'new', label: 'New' },
+  { key: 'screening', label: 'Screening' },
+  { key: 'interviewing', label: 'Interviewing' },
+  { key: 'offer', label: 'Offer' },
+  { key: 'hired', label: 'Hired' },
+  { key: 'rejected', label: 'Rejected' },
+]
+
+interface PipelineStepperProps {
+  currentStep: PipelineStep
+}
+
+function PipelineStepper({ currentStep }: PipelineStepperProps) {
+  const currentIndex = steps.findIndex((s) => s.key === currentStep)
+
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', maxWidth: '800px', mx: 'auto' }}>
+      {steps.map((step, index) => {
+        const isCompleted = index < currentIndex
+        const isCurrent = index === currentIndex
+        const isRejected = step.key === 'rejected'
+        const isLast = index === steps.length - 1
+
+        return (
+          <Box key={step.key} sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
+              {/* Circle */}
+              <Box
+                sx={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: '2px solid',
+                  transition: 'all 0.2s',
+                  borderColor: isCompleted
+                    ? '#4F46E5'
+                    : isCurrent
+                    ? '#4F46E5'
+                    : isRejected
+                    ? '#FCA5A5'
+                    : '#CBD5E1',
+                  bgcolor: isCompleted
+                    ? '#4F46E5'
+                    : isCurrent
+                    ? '#EEF2FF'
+                    : '#FFFFFF',
+                }}
+              >
+                {isCompleted ? (
+                  <Check size={20} className="text-white" strokeWidth={2} />
+                ) : (
+                  <Typography
+                    sx={{
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      color: isCurrent
+                        ? '#4F46E5'
+                        : isRejected
+                        ? '#DC2626'
+                        : '#64748B',
+                    }}
+                  >
+                    {index + 1}
+                  </Typography>
+                )}
+              </Box>
+
+              {/* Label */}
+              <Typography
+                sx={{
+                  mt: 1,
+                  fontSize: '0.875rem',
+                  color: isCurrent
+                    ? '#4F46E5'
+                    : isRejected
+                    ? '#DC2626'
+                    : '#475569',
+                  fontWeight: isCurrent ? 600 : 400,
+                }}
+              >
+                {step.label}
+              </Typography>
+            </Box>
+
+            {/* Connector Line */}
+            {!isLast && (
+              <Box
+                sx={{
+                  height: 2,
+                  flex: 1,
+                  mt: -3,
+                  transition: 'all 0.2s',
+                  bgcolor: isCompleted ? '#4F46E5' : '#CBD5E1',
+                }}
+              />
+            )}
+          </Box>
+        )
+      })}
+    </Box>
+  )
+}
 
 export default function JobDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -224,10 +346,10 @@ export default function JobDetailPage() {
       </Paper>
 
       {/* Main Content Grid */}
-      <Grid container spacing={3}>
-        {/* Left Panel - Job Details */}
-        <Grid size={{ xs: 12, lg: 4 }}>
-          <Paper sx={{ p: 3, mb: 3 }}>
+      <Grid container gap={3}>
+        {/* first  Panel - Job Details */}
+        <Grid size={{ xs: 12, lg: 12 }}>
+          <Paper sx={{ p: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
               <Briefcase size={20} className="text-blue-600" strokeWidth={1.5} />
               <Typography variant="h6" fontWeight="600">
@@ -304,8 +426,8 @@ export default function JobDetailPage() {
           </Paper>
         </Grid>
 
-        {/* Right Panel - Candidates */}
-        <Grid size={{ xs: 12, lg: 8 }}>
+        {/* second Panel - Candidates */}
+        <Grid size={{ xs: 12, lg: 12 }}>
           <Paper sx={{ p: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -346,140 +468,167 @@ export default function JobDetailPage() {
             ) : (
               <Grid container spacing={3}>
                 {/* Candidate List */}
-                <Grid size={{ xs: 12, md: 5 }}>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                    {cvs.map((cv) => (
-                      <Paper
-                        key={cv.id}
-                        onClick={() => setSelectedCvId(cv.id)}
-                        sx={{
-                          p: 2,
-                          cursor: 'pointer',
-                          transition: 'all 0.2s',
-                          borderColor: selectedCvId === cv.id ? '#4F46E5' : 'divider',
-                          borderWidth: selectedCvId === cv.id ? 2 : 1,
-                          bgcolor: selectedCvId === cv.id ? '#EEF2FF' : 'background.paper',
-                          '&:hover': {
-                            borderColor: '#C7D2FE',
-                          },
-                        }}
-                      >
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                          <Box>
-                            <Typography variant="body1" fontWeight="600">
-                              {cv.parsed?.name || cv.fileName}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              {cv.parsed?.currentRole || 'Role not specified'}
-                            </Typography>
-                            {cv.parsed && (
-                              <Typography variant="caption" color="text.secondary">
-                                {cv.parsed.totalExperience} • {cv.parsed.currentCompany}
-                              </Typography>
-                            )}
+                <Grid size={{ xs: 12, md: 4}}>
+                  <Paper sx={{ overflow: 'hidden' }}>
+                    {/* Header */}
+                    <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'divider' }}>
+                      <Typography variant="h6" fontWeight="600">
+                        Candidates
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                        {cvs.length} candidates found
+                      </Typography>
+                    </Box>
+
+                    {/* Candidate List Items */}
+                    <Box>
+                      {cvs.map((cv) => {
+                        const isSelected = cv.id === selectedCvId
+                        const aiMatchScore = cv.parsed?.aiMatchScore || 0
+                        const yearsExp = cv.parsed?.yearsOfExperience || 0
+                        const topSkills = cv.parsed?.topSkills || cv.parsed?.skills.slice(0, 3) || []
+                        const fitLevel = cv.parsed?.fitLevel || 'Medium'
+
+                        return (
+                          <Box
+                            key={cv.id}
+                            onClick={() => setSelectedCvId(cv.id)}
+                            sx={{
+                              p: 3,
+                              cursor: 'pointer',
+                              transition: 'all 0.2s',
+                              borderLeft: '4px solid',
+                              borderLeftColor: isSelected ? '#4F46E5' : 'transparent',
+                              bgcolor: isSelected ? '#EEF2FF' : 'background.paper',
+                              borderBottom: '1px solid',
+                              borderBottomColor: 'divider',
+                              '&:hover': {
+                                bgcolor: isSelected ? '#EEF2FF' : '#F8FAFC',
+                              },
+                              '&:last-child': {
+                                borderBottom: 'none',
+                              },
+                            }}
+                          >
+                            {/* Name and AI Match Score */}
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
+                              <Box sx={{ flex: 1 }}>
+                                <Typography variant="body1" fontWeight="600">
+                                  {cv.parsed?.name || cv.fileName}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                                  {yearsExp} years experience
+                                </Typography>
+                              </Box>
+
+                              {/* AI Match Score */}
+                              <Box sx={{ textAlign: 'center', ml: 2 }}>
+                                <Typography
+                                  sx={{
+                                    fontSize: '1.5rem',
+                                    fontWeight: 'bold',
+                                    color:
+                                      aiMatchScore >= 85
+                                        ? '#10b981'
+                                        : aiMatchScore >= 70
+                                        ? '#3b82f6'
+                                        : '#f59e0b',
+                                  }}
+                                >
+                                  {aiMatchScore}%
+                                </Typography>
+                                <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+                                  Match
+                                </Typography>
+                              </Box>
+                            </Box>
+
+                            {/* Top Skills */}
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 1.5 }}>
+                              {topSkills.map((skill, idx) => (
+                                <Chip
+                                  key={idx}
+                                  label={skill}
+                                  size="small"
+                                  sx={{
+                                    bgcolor: '#F1F5F9',
+                                    color: '#475569',
+                                    fontSize: '0.75rem',
+                                    height: 24,
+                                  }}
+                                />
+                              ))}
+                            </Box>
+
+                            {/* Fit Badge */}
+                            <Box>
+                              <Chip
+                                label={`${fitLevel} Fit`}
+                                size="small"
+                                sx={{
+                                  bgcolor:
+                                    fitLevel === 'Strong'
+                                      ? '#DCFCE7'
+                                      : fitLevel === 'Medium'
+                                      ? '#DBEAFE'
+                                      : '#FEF3C7',
+                                  color:
+                                    fitLevel === 'Strong'
+                                      ? '#15803D'
+                                      : fitLevel === 'Medium'
+                                      ? '#1E40AF'
+                                      : '#A16207',
+                                  fontSize: '0.75rem',
+                                  height: 24,
+                                }}
+                              />
+                            </Box>
                           </Box>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Chip
-                              label={cv.status.charAt(0).toUpperCase() + cv.status.slice(1)}
-                              size="small"
-                              sx={{
-                                ...getCVStatusStyles(cv.status),
-                                border: '1px solid',
-                                fontSize: '0.7rem',
-                              }}
-                            />
-                            <ChevronRight size={16} className="text-gray-400" strokeWidth={1.5} />
-                          </Box>
-                        </Box>
-                      </Paper>
-                    ))}
-                  </Box>
+                        )
+                      })}
+                    </Box>
+                  </Paper>
                 </Grid>
 
                 {/* Candidate Details */}
-                <Grid size={{ xs: 12, md: 7 }}>
-                  {selectedCv && selectedCv.parsed && (
-                    <Paper sx={{ p: 3, bgcolor: '#FAFAFA' }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
-                        <Box>
-                          <Typography variant="h6" fontWeight="bold">
-                            {selectedCv.parsed.name}
-                          </Typography>
-                          <Typography variant="body1" color="text.secondary">
-                            {selectedCv.parsed.currentRole} at {selectedCv.parsed.currentCompany}
-                          </Typography>
-                        </Box>
-                        <Chip
-                          label={selectedCv.status.charAt(0).toUpperCase() + selectedCv.status.slice(1)}
-                          sx={{
-                            ...getCVStatusStyles(selectedCv.status),
-                            border: '1px solid',
-                          }}
-                        />
-                      </Box>
+                <Grid size={{ xs: 12, md: 8 }}>
+                  {selectedCv && selectedCv.parsed && job && (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                      {/* Pipeline Stepper */}
+                      <Paper sx={{ p: 3 }}>
+                        <PipelineStepper currentStep={selectedCv.parsed.pipelineStep || 'screening'} />
+                      </Paper>
 
-                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                        <Box>
-                          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                            Experience
+                      {/* Render different views based on pipeline step */}
+                      {selectedCv.parsed.pipelineStep === 'new' && (
+                        <CandidateScreeningView cv={selectedCv} job={job} />
+                      )}
+                      {selectedCv.parsed.pipelineStep === 'screening' && (
+                        <CandidateScreeningView cv={selectedCv} job={job} />
+                      )}
+                      {selectedCv.parsed.pipelineStep === 'interviewing' && (
+                        <CandidateInterviewingView cv={selectedCv} job={job} />
+                      )}
+                      {selectedCv.parsed.pipelineStep === 'offer' && (
+                        <CandidateOfferView cv={selectedCv} job={job} />
+                      )}
+                      {selectedCv.parsed.pipelineStep === 'hired' && (
+                        <CandidateHiredView cv={selectedCv} job={job} />
+                      )}
+                      {selectedCv.parsed.pipelineStep === 'rejected' && (
+                        <Paper sx={{ p: 4, textAlign: 'center' }}>
+                          <Typography variant="h6" color="error" sx={{ mb: 1 }}>
+                            Candidate Rejected
                           </Typography>
-                          <Typography variant="body1">
-                            {selectedCv.parsed.totalExperience}
+                          <Typography variant="body2" color="text.secondary">
+                            This candidate was not selected for this position.
                           </Typography>
-                        </Box>
-
-                        <Box>
-                          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                            Education
-                          </Typography>
-                          <Typography variant="body1">
-                            {selectedCv.parsed.education}
-                          </Typography>
-                        </Box>
-
-                        <Box>
-                          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                            Skills
-                          </Typography>
-                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                            {selectedCv.parsed.skills.map((skill, idx) => (
-                              <Chip
-                                key={idx}
-                                label={skill}
-                                size="small"
-                                sx={{ bgcolor: '#F1F5F9', color: '#475569' }}
-                              />
-                            ))}
-                          </Box>
-                        </Box>
-
-                        <Box>
-                          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                            Previous Companies
-                          </Typography>
-                          <Typography variant="body1">
-                            {selectedCv.parsed.previousCompanies.join(', ')}
-                          </Typography>
-                        </Box>
-                      </Box>
-
-                      <Divider sx={{ my: 3 }} />
-
-                      <Stack direction="row" spacing={2}>
-                        <Button
-                          variant="contained"
-                          sx={{
-                            bgcolor: '#4F46E5',
-                            '&:hover': { bgcolor: '#4338CA' },
-                          }}
-                        >
-                          Schedule Interview
-                        </Button>
-                        <Button variant="outlined">
-                          View Full CV
-                        </Button>
-                      </Stack>
-                    </Paper>
+                        </Paper>
+                      )}
+                      {!selectedCv.parsed.pipelineStep && (
+                        <CandidateScreeningView cv={selectedCv} job={job} />
+                      )}
+                    </Box>
                   )}
                 </Grid>
               </Grid>
