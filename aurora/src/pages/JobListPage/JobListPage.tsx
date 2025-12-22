@@ -54,13 +54,6 @@ export default function JobListPage() {
     })
   }
 
-  const formatSalary = (min?: number, max?: number) => {
-    if (!min && !max) return 'Not specified'
-    if (min && max) return `$${min.toLocaleString()} - $${max.toLocaleString()}`
-    if (min) return `From $${min.toLocaleString()}`
-    return `Up to $${max?.toLocaleString()}`
-  }
-
   const getStatusStyles = (status: JobRequisition['status']) => {
     switch (status) {
       case 'active':
@@ -291,9 +284,6 @@ export default function JobListPage() {
                         {job.targetYearsMin}-{job.targetYearsMax} years exp.
                       </Typography>
                     </Box>
-                    <Typography variant="body2" color="text.secondary">
-                      {formatSalary(job.salaryMin, job.salaryMax)}
-                    </Typography>
                   </Box>
 
                   {/* Skills Row */}

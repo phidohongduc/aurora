@@ -13,8 +13,6 @@ export interface JobRequisition {
   targetYearsMax?: number
   requiredSkills: string[]
   niceToHaveSkills: string[]
-  salaryMin?: number
-  salaryMax?: number
   status: 'active' | 'paused' | 'closed'
   candidateCount?: number
   createdAt: string
@@ -31,8 +29,6 @@ export interface CreateJobRequisitionRequest {
   targetYearsMax?: number
   requiredSkills: string[]
   niceToHaveSkills: string[]
-  salaryMin?: number
-  salaryMax?: number
 }
 
 // Parsed CV data from AI

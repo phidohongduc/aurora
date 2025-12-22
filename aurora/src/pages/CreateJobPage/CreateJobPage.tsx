@@ -15,7 +15,7 @@ import {
   InputAdornment,
   Divider,
 } from '@mui/material'
-import { Briefcase, MapPin, Users, DollarSign } from 'lucide-react'
+import { Briefcase, MapPin, Users } from 'lucide-react'
 import type { LocationType, EmploymentType } from '@/types'
 import { createJob } from './APIHandler'
 
@@ -29,8 +29,6 @@ interface FormData {
   targetYearsMax: string
   requiredSkills: string[]
   niceToHaveSkills: string[]
-  salaryMin: string
-  salaryMax: string
 }
 
 const locationOptions: LocationType[] = ['Remote', 'Hybrid', 'Onsite']
@@ -51,8 +49,6 @@ export default function CreateJobPage() {
     targetYearsMax: '',
     requiredSkills: [],
     niceToHaveSkills: [],
-    salaryMin: '',
-    salaryMax: '',
   })
 
   const [requiredSkillInput, setRequiredSkillInput] = useState('')
@@ -114,8 +110,6 @@ export default function CreateJobPage() {
         targetYearsMax: formData.targetYearsMax ? Number(formData.targetYearsMax) : undefined,
         requiredSkills: formData.requiredSkills,
         niceToHaveSkills: formData.niceToHaveSkills,
-        salaryMin: formData.salaryMin ? Number(formData.salaryMin) : undefined,
-        salaryMax: formData.salaryMax ? Number(formData.salaryMax) : undefined,
       })
 
       if (response.success) {
@@ -363,54 +357,6 @@ export default function CreateJobPage() {
               </Grid>
             </Grid>
           </Box>
-
-          <Divider sx={{ my: 4 }} />
-
-          {/* Compensation Section */}
-          <Box sx={{ mb: 4 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
-              <DollarSign size={24} className="text-blue-600" strokeWidth={1.5} />
-              <Typography variant="h6" fontWeight="600">
-                Compensation
-              </Typography>
-            </Box>
-
-            <Grid container spacing={3}>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField
-                  label="Salary Range (Min)"
-                  type="number"
-                  fullWidth
-                  value={formData.salaryMin}
-                  onChange={handleChange('salaryMin')}
-                  placeholder="e.g., 120000"
-                  disabled={loading}
-                  InputProps={{
-                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                  }}
-                  inputProps={{ min: 0 }}
-                />
-              </Grid>
-
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField
-                  label="Salary Range (Max)"
-                  type="number"
-                  fullWidth
-                  value={formData.salaryMax}
-                  onChange={handleChange('salaryMax')}
-                  placeholder="e.g., 180000"
-                  disabled={loading}
-                  InputProps={{
-                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                  }}
-                  inputProps={{ min: 0 }}
-                />
-              </Grid>
-            </Grid>
-          </Box>
-
-          <Divider sx={{ my: 4 }} />
 
           {/* Submit Button */}
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>

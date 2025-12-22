@@ -24,8 +24,6 @@ export async function createJob(
     targetYearsMax: request.targetYearsMax,
     requiredSkills: request.requiredSkills,
     niceToHaveSkills: request.niceToHaveSkills,
-    salaryMin: request.salaryMin,
-    salaryMax: request.salaryMax,
     status: 'active',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
