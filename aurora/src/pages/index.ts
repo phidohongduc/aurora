@@ -1,0 +1,5 @@
+export { default as MainPage } from './MainPage'
+export { default as JobListPage } from './JobListPage'
+export { default as CreateJobPage } from './CreateJobPage'
+export { default as JobDetailPage } from './JobDetailPage'
+export { default as UploadCVPage } from './UploadCVPage'
