@@ -34,12 +34,24 @@ export interface CreateJobRequisitionRequest {
   salaryMax?: number
 }
 
+// Parsed CV data from AI
+export interface ParsedCVData {
+  name: string
+  currentRole: string
+  currentCompany: string
+  totalExperience: string
+  skills: string[]
+  education: string
+  previousCompanies: string[]
+}
+
 export interface CV {
   id: string
   fileName: string
   fileSize: number
   uploadedAt: string
   status: 'pending' | 'reviewed' | 'shortlisted' | 'rejected'
+  parsed?: ParsedCVData
 }
 
 export interface DashboardStats {

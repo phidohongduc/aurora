@@ -1,32 +1,144 @@
-import type { ApiResponse, CV } from '@/types'
+import type { ApiResponse, CV, JobRequisition, ParsedCVData } from '@/types'
+
+// Mock parsed CV data for simulation
+const mockParsedCVs: ParsedCVData[] = [
+  {
+    name: 'Alex Chen',
+    currentRole: 'Senior Backend Engineer',
+    currentCompany: 'TechCorp',
+    totalExperience: '8 years',
+    skills: ['Python', 'Django', 'PostgreSQL', 'AWS', 'Docker', 'Kubernetes', 'Redis'],
+    education: 'M.S. Computer Science - Stanford University',
+    previousCompanies: ['TechCorp', 'StartupXYZ'],
+  },
+  {
+    name: 'Sarah Martinez',
+    currentRole: 'Backend Developer',
+    currentCompany: 'CloudScale Inc',
+    totalExperience: '6 years',
+    skills: ['Python', 'FastAPI', 'PostgreSQL', 'AWS', 'Docker', 'GraphQL', 'MongoDB'],
+    education: 'B.S. Software Engineering - UT Austin',
+    previousCompanies: ['CloudScale Inc', 'TechStart'],
+  },
+  {
+    name: 'Michael Park',
+    currentRole: 'Full Stack Engineer',
+    currentCompany: 'StartupXYZ',
+    totalExperience: '5 years',
+    skills: ['Python', 'Django', 'JavaScript', 'React', 'PostgreSQL', 'Docker'],
+    education: 'B.S. Computer Science - University of Washington',
+    previousCompanies: ['StartupXYZ', 'WebCorp'],
+  },
+  {
+    name: 'Emily Rodriguez',
+    currentRole: 'Software Engineer',
+    currentCompany: 'DataFlow',
+    totalExperience: '4 years',
+    skills: ['Java', 'Spring Boot', 'MySQL', 'AWS', 'Microservices'],
+    education: 'B.S. Computer Science - UCLA',
+    previousCompanies: ['DataFlow', 'CodeBase Inc'],
+  },
+  {
+    name: 'James Wilson',
+    currentRole: 'DevOps Engineer',
+    currentCompany: 'CloudNative',
+    totalExperience: '7 years',
+    skills: ['Kubernetes', 'Docker', 'Terraform', 'AWS', 'CI/CD', 'Python'],
+    education: 'B.S. Information Technology - MIT',
+    previousCompanies: ['CloudNative', 'InfraTech'],
+  },
+]
+
+// Mock job requisitions (shared with JobDetailPage)
+const mockJobs: Record<string, JobRequisition> = {
+  '1': {
+    id: '1',
+    title: 'Senior Backend Engineer',
+    department: 'Engineering',
+    location: 'Remote',
+    employmentType: 'Full-time',
+    hiringManager: 'John Smith',
+    targetYearsMin: 5,
+    targetYearsMax: 8,
+    requiredSkills: ['Python', 'Django', 'PostgreSQL', 'AWS'],
+    niceToHaveSkills: ['Docker', 'Kubernetes', 'Redis'],
+    salaryMin: 150000,
+    salaryMax: 200000,
+    status: 'open',
+    createdAt: '2025-12-15T10:00:00Z',
+    updatedAt: '2025-12-20T14:30:00Z',
+  },
+  '2': {
+    id: '2',
+    title: 'Product Manager',
+    department: 'Product',
+    location: 'Hybrid',
+    employmentType: 'Full-time',
+    hiringManager: 'Sarah Johnson',
+    targetYearsMin: 3,
+    targetYearsMax: 6,
+    requiredSkills: ['Product Strategy', 'Agile', 'User Research'],
+    niceToHaveSkills: ['SQL', 'Data Analysis'],
+    salaryMin: 120000,
+    salaryMax: 160000,
+    status: 'open',
+    createdAt: '2025-12-10T09:00:00Z',
+    updatedAt: '2025-12-18T11:00:00Z',
+  },
+  '3': {
+    id: '3',
+    title: 'UX Designer',
+    department: 'Design',
+    location: 'Onsite',
+    employmentType: 'Full-time',
+    hiringManager: 'Mike Chen',
+    targetYearsMin: 2,
+    targetYearsMax: 5,
+    requiredSkills: ['Figma', 'User Research', 'Prototyping'],
+    niceToHaveSkills: ['HTML/CSS', 'Design Systems'],
+    salaryMin: 100000,
+    salaryMax: 140000,
+    status: 'open',
+    createdAt: '2025-12-12T14:00:00Z',
+    updatedAt: '2025-12-19T10:00:00Z',
+  },
+}
 
 // Mock CVs storage per job
 const mockCVsByJob: Record<string, CV[]> = {
-  '1': [
-    { id: 'cv1', fileName: 'john_doe_resume.pdf', fileSize: 245000, uploadedAt: '2025-12-21T10:30:00Z', status: 'reviewed' },
-    { id: 'cv2', fileName: 'jane_smith_cv.pdf', fileSize: 189000, uploadedAt: '2025-12-21T11:45:00Z', status: 'shortlisted' },
-    { id: 'cv3', fileName: 'bob_wilson_resume.docx', fileSize: 156000, uploadedAt: '2025-12-22T09:00:00Z', status: 'pending' },
-  ],
-  '2': [
-    { id: 'cv4', fileName: 'alice_johnson_pm.pdf', fileSize: 278000, uploadedAt: '2025-12-20T14:00:00Z', status: 'pending' },
-  ],
+  '1': [],
+  '2': [],
   '3': [],
-  '4': [
-    { id: 'cv5', fileName: 'data_analyst_resume.pdf', fileSize: 198000, uploadedAt: '2025-12-16T10:00:00Z', status: 'rejected' },
-  ],
-  '5': [
-    { id: 'cv6', fileName: 'devops_engineer.pdf', fileSize: 220000, uploadedAt: '2025-12-18T15:30:00Z', status: 'reviewed' },
-    { id: 'cv7', fileName: 'cloud_specialist.pdf', fileSize: 245000, uploadedAt: '2025-12-19T09:15:00Z', status: 'pending' },
-  ],
 }
 
 // Mock ID counter
-let nextCVId = 8
+let nextCVId = 1
+let parsedCVIndex = 0
 
 // Simulate API delay (1-2 seconds)
 const simulateDelay = () => new Promise(resolve =>
   setTimeout(resolve, Math.random() * 1000 + 1000)
 )
+
+export async function getJobDetail(jobId: string): Promise<ApiResponse<JobRequisition | null>> {
+  await simulateDelay()
+
+  const job = mockJobs[jobId]
+
+  if (!job) {
+    return {
+      data: null,
+      success: false,
+      message: 'Job not found',
+    }
+  }
+
+  return {
+    data: job,
+    success: true,
+    message: 'Job fetched successfully',
+  }
+}
 
 export async function getCVsForJob(jobId: string): Promise<ApiResponse<CV[]>> {
   await simulateDelay()
@@ -42,16 +154,21 @@ export async function getCVsForJob(jobId: string): Promise<ApiResponse<CV[]>> {
 
 export async function uploadCV(
   jobId: string,
-  file: File
+  _file: File
 ): Promise<ApiResponse<CV>> {
   await simulateDelay()
 
+  // Get next mock parsed CV data
+  const parsedData = mockParsedCVs[parsedCVIndex % mockParsedCVs.length]
+  parsedCVIndex++
+
   const newCV: CV = {
     id: `cv${nextCVId++}`,
-    fileName: file.name,
-    fileSize: file.size,
+    fileName: `${parsedData.name.toLowerCase().replace(' ', '_')}_resume.pdf`,
+    fileSize: Math.floor(Math.random() * 200000) + 100000,
     uploadedAt: new Date().toISOString(),
     status: 'pending',
+    parsed: parsedData,
   }
 
   // Add to mock storage
@@ -63,7 +180,7 @@ export async function uploadCV(
   return {
     data: newCV,
     success: true,
-    message: 'CV uploaded successfully',
+    message: 'CV uploaded and parsed successfully',
   }
 }
 
@@ -73,13 +190,19 @@ export async function uploadMultipleCVs(
 ): Promise<ApiResponse<CV[]>> {
   await simulateDelay()
 
-  const newCVs: CV[] = files.map(file => ({
-    id: `cv${nextCVId++}`,
-    fileName: file.name,
-    fileSize: file.size,
-    uploadedAt: new Date().toISOString(),
-    status: 'pending' as const,
-  }))
+  const newCVs: CV[] = files.map(() => {
+    const parsedData = mockParsedCVs[parsedCVIndex % mockParsedCVs.length]
+    parsedCVIndex++
+
+    return {
+      id: `cv${nextCVId++}`,
+      fileName: `${parsedData.name.toLowerCase().replace(' ', '_')}_resume.pdf`,
+      fileSize: Math.floor(Math.random() * 200000) + 100000,
+      uploadedAt: new Date().toISOString(),
+      status: 'pending' as const,
+      parsed: parsedData,
+    }
+  })
 
   // Add to mock storage
   if (!mockCVsByJob[jobId]) {
@@ -90,7 +213,7 @@ export async function uploadMultipleCVs(
   return {
     data: newCVs,
     success: true,
-    message: `${files.length} CV(s) uploaded successfully`,
+    message: `${files.length} CV(s) uploaded and parsed successfully`,
   }
 }
 
