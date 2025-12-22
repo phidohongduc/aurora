@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Container,
   Typography,
@@ -31,6 +32,7 @@ import {
   X,
   ExternalLink,
   User as UserIcon,
+  Network,
 } from 'lucide-react'
 
 interface Employee {
@@ -179,6 +181,7 @@ const mockEmployees: Employee[] = [
 ]
 
 export default function EmployeesPage() {
+  const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null)
 
@@ -210,13 +213,23 @@ export default function EmployeesPage() {
               View all hired employees and their information
             </Typography>
           </Box>
-          <Box sx={{ textAlign: 'right' }}>
-            <Typography variant="h3" color="primary.main" fontWeight="bold">
-              {mockEmployees.length}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Total Employees
-            </Typography>
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+            <Button
+              variant="contained"
+              startIcon={<Network size={18} />}
+              onClick={() => navigate('/employees/skill-network')}
+              sx={{ whiteSpace: 'nowrap' }}
+            >
+              Skill Network
+            </Button>
+            <Box sx={{ textAlign: 'right' }}>
+              <Typography variant="h3" color="primary.main" fontWeight="bold">
+                {mockEmployees.length}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Total Employees
+              </Typography>
+            </Box>
           </Box>
         </Box>
       </motion.div>
