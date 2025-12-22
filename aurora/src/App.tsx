@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material'
 import { FloatingDock, type DockItem } from '@/components/ui'
 import { AICompanion } from '@/components/AICompanion'
-import { Home, Briefcase, PlusCircle, Upload } from 'lucide-react'
+import { Home, Briefcase, PlusCircle } from 'lucide-react'
 import {
   MainPage,
   JobListPage,
@@ -90,11 +90,6 @@ const navigationItems: DockItem[] = [
     icon: <PlusCircle className="w-full h-full text-gray-600" strokeWidth={1.5} />,
     href: '/jobs/new',
   },
-  {
-    title: 'Upload CVs',
-    icon: <Upload className="w-full h-full text-gray-600" strokeWidth={1.5} />,
-    href: '/jobs/1/upload',
-  },
 ]
 
 function App() {
@@ -103,7 +98,7 @@ function App() {
       <CssBaseline />
       <BrowserRouter>
         <div className="relative flex min-h-screen flex-col">
-          <main className="flex-1 pb-24 pr-[380px]">
+          <main className="flex-1 pb-24">
             <Routes>
               <Route path="/" element={<MainPage />} />
               <Route path="/jobs" element={<JobListPage />} />
@@ -112,7 +107,7 @@ function App() {
               <Route path="/jobs/:id/upload" element={<UploadCVPage />} />
             </Routes>
           </main>
-          <div className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2 -ml-[190px]">
+          <div className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2">
             <FloatingDock items={navigationItems} />
           </div>
           <AICompanion />

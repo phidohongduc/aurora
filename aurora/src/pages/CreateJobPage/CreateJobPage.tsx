@@ -290,14 +290,20 @@ export default function CreateJobPage() {
 
   return (
     <Container maxWidth="md" sx={{ py: 6 }}>
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
-          Create Job Requisition
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Define the role requirements and help AI match the best candidates
-        </Typography>
-      </Box>
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
+            Create Job Requisition
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Define the role requirements and help AI match the best candidates
+          </Typography>
+        </Box>
+      </motion.div>
 
       {error && (
         <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
@@ -311,7 +317,12 @@ export default function CreateJobPage() {
         </Alert>
       )}
 
-      <Paper sx={{ p: 4 }}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+      >
+        <Paper sx={{ p: 4 }}>
         <Box component="form" onSubmit={handleSubmit}>
           {/* Basic Information Section */}
           <Box sx={{ mb: 5 }}>
@@ -608,6 +619,7 @@ export default function CreateJobPage() {
           </Box>
         </Box>
       </Paper>
+      </motion.div>
     </Container>
   )
 }
