@@ -26,7 +26,7 @@ export async function createJob(
     niceToHaveSkills: request.niceToHaveSkills,
     salaryMin: request.salaryMin,
     salaryMax: request.salaryMax,
-    status: 'open',
+    status: 'active',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   }

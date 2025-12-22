@@ -1,28 +1,28 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   Container,
   Typography,
   Box,
   Button,
   Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Chip,
-  IconButton,
   CircularProgress,
+  TextField,
+  InputAdornment,
 } from '@mui/material'
-import { Plus, Eye } from 'lucide-react'
+import { Briefcase, MapPin, Clock, Search, Plus, ChevronRight } from 'lucide-react'
 import type { JobRequisition } from '@/types'
 import { getJobList } from './APIHandler'
 
+type FilterStatus = 'all' | 'active' | 'paused' | 'closed'
+
 export default function JobListPage() {
+  const navigate = useNavigate()
   const [jobs, setJobs] = useState<JobRequisition[]>([])
   const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterStatus, setFilterStatus] = useState<FilterStatus>('all')
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -38,6 +38,14 @@ export default function JobListPage() {
     fetchJobs()
   }, [])
 
+  const filteredJobs = jobs.filter((job) => {
+    const matchesSearch =
+      job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      job.department.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesStatus = filterStatus === 'all' || job.status === filterStatus
+    return matchesSearch && matchesStatus
+  })
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -46,98 +54,297 @@ export default function JobListPage() {
     })
   }
 
-  const getStatusColor = (status: JobRequisition['status']) => {
+  const formatSalary = (min?: number, max?: number) => {
+    if (!min && !max) return 'Not specified'
+    if (min && max) return `$${min.toLocaleString()} - $${max.toLocaleString()}`
+    if (min) return `From $${min.toLocaleString()}`
+    return `Up to $${max?.toLocaleString()}`
+  }
+
+  const getStatusStyles = (status: JobRequisition['status']) => {
     switch (status) {
-      case 'open':
-        return 'success'
+      case 'active':
+        return {
+          bgcolor: '#DCFCE7',
+          color: '#15803D',
+          borderColor: '#BBF7D0',
+        }
+      case 'paused':
+        return {
+          bgcolor: '#FEF9C3',
+          color: '#A16207',
+          borderColor: '#FDE68A',
+        }
       case 'closed':
-        return 'error'
-      case 'draft':
-        return 'default'
+        return {
+          bgcolor: '#F1F5F9',
+          color: '#475569',
+          borderColor: '#E2E8F0',
+        }
       default:
-        return 'default'
+        return {
+          bgcolor: '#F1F5F9',
+          color: '#475569',
+          borderColor: '#E2E8F0',
+        }
     }
   }
 
+  const handleJobClick = (jobId: string) => {
+    navigate(`/jobs/${jobId}`)
+  }
+
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ py: 4, px: 4 }}>
+      {/* Header */}
       <Box
         sx={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center',
+          alignItems: 'flex-start',
           mb: 4,
         }}
       >
-        <Typography variant="h4" component="h1" fontWeight="bold">
-          Job Requisitions
-        </Typography>
+        <Box>
+          <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
+            Job Requisitions
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Manage and track open positions
+          </Typography>
+        </Box>
         <Button
           component={Link}
           to="/jobs/new"
           variant="contained"
           startIcon={<Plus size={20} strokeWidth={2} />}
+          sx={{
+            px: 3,
+            py: 1.5,
+            bgcolor: '#4F46E5',
+            '&:hover': { bgcolor: '#4338CA' },
+          }}
         >
-          Create New
+          Create New Requisition
         </Button>
       </Box>
 
+      {/* Search and Filter */}
+      <Paper sx={{ p: 3, mb: 3 }}>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <TextField
+            fullWidth
+            placeholder="Search by title or department..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search size={20} className="text-gray-400" strokeWidth={1.5} />
+                </InputAdornment>
+              ),
+            }}
+            sx={{ flex: 1 }}
+          />
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            {(['all', 'active', 'paused', 'closed'] as const).map((status) => (
+              <Button
+                key={status}
+                variant="text"
+                onClick={() => setFilterStatus(status)}
+                sx={{
+                  px: 2,
+                  py: 1,
+                  textTransform: 'capitalize',
+                  bgcolor: filterStatus === status ? '#EEF2FF' : '#F1F5F9',
+                  color: filterStatus === status ? '#4338CA' : '#475569',
+                  '&:hover': {
+                    bgcolor: filterStatus === status ? '#E0E7FF' : '#E2E8F0',
+                  },
+                }}
+              >
+                {status}
+              </Button>
+            ))}
+          </Box>
+        </Box>
+      </Paper>
+
+      {/* Loading State */}
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
           <CircularProgress />
         </Box>
+      ) : filteredJobs.length === 0 ? (
+        /* Empty State */
+        <Paper sx={{ p: 6, textAlign: 'center' }}>
+          <Briefcase size={48} className="text-gray-300 mx-auto mb-4" strokeWidth={1.5} />
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+            No job requisitions found
+          </Typography>
+          <Button
+            component={Link}
+            to="/jobs/new"
+            variant="contained"
+            sx={{
+              bgcolor: '#4F46E5',
+              '&:hover': { bgcolor: '#4338CA' },
+            }}
+          >
+            Create Your First Requisition
+          </Button>
+        </Paper>
       ) : (
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>Title</TableCell>
-                <TableCell>Department</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Created</TableCell>
-                <TableCell align="right">Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {jobs.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
-                    <Typography color="text.secondary">
-                      No job requisitions yet. Create your first one!
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                jobs.map((job) => (
-                  <TableRow key={job.id} hover>
-                    <TableCell>#{job.id}</TableCell>
-                    <TableCell>{job.title}</TableCell>
-                    <TableCell>{job.department}</TableCell>
-                    <TableCell>
-                      <Chip
-                        label={job.status.charAt(0).toUpperCase() + job.status.slice(1)}
-                        color={getStatusColor(job.status)}
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell>{formatDate(job.createdAt)}</TableCell>
-                    <TableCell align="right">
-                      <IconButton
-                        component={Link}
-                        to={`/jobs/${job.id}`}
-                        size="small"
-                        color="primary"
+        /* Job Requisitions Grid */
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {filteredJobs.map((job) => (
+            <Paper
+              key={job.id}
+              onClick={() => handleJobClick(job.id)}
+              sx={{
+                p: 3,
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                '&:hover': {
+                  borderColor: '#C7D2FE',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                },
+                '&:hover .job-title': {
+                  color: '#4F46E5',
+                },
+                '&:hover .chevron-icon': {
+                  color: '#4F46E5',
+                },
+              }}
+            >
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                {/* Icon */}
+                <Box
+                  sx={{
+                    width: 48,
+                    height: 48,
+                    bgcolor: '#EEF2FF',
+                    borderRadius: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <Briefcase size={24} className="text-indigo-600" strokeWidth={1.5} />
+                </Box>
+
+                {/* Content */}
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  {/* Title Row */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-start',
+                      mb: 1,
+                    }}
+                  >
+                    <Box>
+                      <Typography
+                        variant="h6"
+                        fontWeight="600"
+                        className="job-title"
+                        sx={{ transition: 'color 0.2s' }}
                       >
-                        <Eye size={20} strokeWidth={1.5} />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                        {job.title}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {job.department}
+                      </Typography>
+                    </Box>
+                    <Chip
+                      label={job.status.charAt(0).toUpperCase() + job.status.slice(1)}
+                      size="small"
+                      sx={{
+                        ...getStatusStyles(job.status),
+                        border: '1px solid',
+                        fontWeight: 500,
+                      }}
+                    />
+                  </Box>
+
+                  {/* Info Row */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 3,
+                      mb: 2,
+                      flexWrap: 'wrap',
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <MapPin size={16} className="text-gray-400" strokeWidth={1.5} />
+                      <Typography variant="body2" color="text.secondary">
+                        {job.location}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Clock size={16} className="text-gray-400" strokeWidth={1.5} />
+                      <Typography variant="body2" color="text.secondary">
+                        {job.targetYearsMin}-{job.targetYearsMax} years exp.
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2" color="text.secondary">
+                      {formatSalary(job.salaryMin, job.salaryMax)}
+                    </Typography>
+                  </Box>
+
+                  {/* Skills Row */}
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+                    {job.requiredSkills.slice(0, 5).map((skill, idx) => (
+                      <Chip
+                        key={idx}
+                        label={skill}
+                        size="small"
+                        sx={{
+                          bgcolor: '#F1F5F9',
+                          color: '#475569',
+                          fontSize: '0.75rem',
+                        }}
+                      />
+                    ))}
+                    {job.requiredSkills.length > 5 && (
+                      <Typography variant="body2" color="text.secondary" sx={{ py: 0.5 }}>
+                        +{job.requiredSkills.length - 5} more
+                      </Typography>
+                    )}
+                  </Box>
+
+                  {/* Footer Row */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      Created {formatDate(job.createdAt)}
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        {job.candidateCount || 0} candidate{job.candidateCount !== 1 ? 's' : ''}
+                      </Typography>
+                      <ChevronRight
+                        size={20}
+                        className="chevron-icon text-gray-400"
+                        strokeWidth={1.5}
+                        style={{ transition: 'color 0.2s' }}
+                      />
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
+            </Paper>
+          ))}
+        </Box>
       )}
     </Container>
   )

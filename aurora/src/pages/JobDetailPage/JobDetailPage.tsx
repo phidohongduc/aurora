@@ -79,11 +79,11 @@ export default function JobDetailPage() {
 
   const getStatusColor = (status: JobRequisition['status']) => {
     switch (status) {
-      case 'open':
+      case 'active':
         return 'success'
+      case 'paused':
+        return 'warning'
       case 'closed':
-        return 'error'
-      case 'draft':
         return 'default'
       default:
         return 'default'

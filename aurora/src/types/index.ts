@@ -15,7 +15,8 @@ export interface JobRequisition {
   niceToHaveSkills: string[]
   salaryMin?: number
   salaryMax?: number
-  status: 'open' | 'closed' | 'draft'
+  status: 'active' | 'paused' | 'closed'
+  candidateCount?: number
   createdAt: string
   updatedAt: string
 }
