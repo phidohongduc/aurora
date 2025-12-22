@@ -1,7 +1,9 @@
 import type { ApiResponse, JobRequisition } from '@/types'
 
-// Mock data
-const mockJobs: JobRequisition[] = [
+const STORAGE_KEY = 'aurora_job_requisitions'
+
+// Initialize with mock data if localStorage is empty
+const initializeMockJobs = (): JobRequisition[] => [
   {
     id: '1',
     title: 'Senior Backend Engineer',
@@ -84,6 +86,31 @@ const mockJobs: JobRequisition[] = [
   },
 ]
 
+// Get jobs from localStorage or initialize with mock data
+const getStoredJobs = (): JobRequisition[] => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    if (stored) {
+      return JSON.parse(stored)
+    }
+    const mockJobs = initializeMockJobs()
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(mockJobs))
+    return mockJobs
+  } catch (error) {
+    console.error('Error reading from localStorage:', error)
+    return initializeMockJobs()
+  }
+}
+
+// Save jobs to localStorage
+const saveJobs = (jobs: JobRequisition[]): void => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(jobs))
+  } catch (error) {
+    console.error('Error saving to localStorage:', error)
+  }
+}
+
 // Simulate API delay (1-2 seconds)
 const simulateDelay = () => new Promise(resolve =>
   setTimeout(resolve, Math.random() * 1000 + 1000)
@@ -92,8 +119,10 @@ const simulateDelay = () => new Promise(resolve =>
 export async function getJobList(): Promise<ApiResponse<JobRequisition[]>> {
   await simulateDelay()
 
+  const jobs = getStoredJobs()
+
   return {
-    data: mockJobs,
+    data: jobs,
     success: true,
     message: 'Jobs fetched successfully',
   }
@@ -102,8 +131,9 @@ export async function getJobList(): Promise<ApiResponse<JobRequisition[]>> {
 export async function deleteJob(id: string): Promise<ApiResponse<null>> {
   await simulateDelay()
 
-  // In real app, this would delete from backend
-  console.log(`Deleting job ${id}`)
+  const jobs = getStoredJobs()
+  const filteredJobs = jobs.filter(job => job.id !== id)
+  saveJobs(filteredJobs)
 
   return {
     data: null,

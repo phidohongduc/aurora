@@ -10,10 +10,14 @@ import {
   CircularProgress,
   TextField,
   InputAdornment,
+  IconButton,
+  Snackbar,
+  Alert,
 } from '@mui/material'
-import { Briefcase, MapPin, Clock, Search, Plus, ChevronRight } from 'lucide-react'
+import { motion } from 'motion/react'
+import { Briefcase, MapPin, Clock, Search, Plus, ChevronRight, X } from 'lucide-react'
 import type { JobRequisition } from '@/types'
-import { getJobList } from './APIHandler'
+import { getJobList, deleteJob } from './APIHandler'
 
 type FilterStatus = 'all' | 'active' | 'paused' | 'closed'
 
@@ -23,6 +27,16 @@ export default function JobListPage() {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all')
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean
+    message: string
+    severity: 'success' | 'error'
+  }>({
+    open: false,
+    message: '',
+    severity: 'success',
+  })
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -37,6 +51,41 @@ export default function JobListPage() {
     }
     fetchJobs()
   }, [])
+
+  const handleDeleteJob = async (e: React.MouseEvent, jobId: string) => {
+    e.stopPropagation() // Prevent navigation to job detail
+    
+    if (!confirm('Are you sure you want to delete this job requisition?')) {
+      return
+    }
+
+    setDeletingId(jobId)
+    try {
+      const response = await deleteJob(jobId)
+      if (response.success) {
+        setJobs(jobs.filter(job => job.id !== jobId))
+        setSnackbar({
+          open: true,
+          message: 'Job requisition deleted successfully',
+          severity: 'success',
+        })
+      } else {
+        setSnackbar({
+          open: true,
+          message: 'Failed to delete job requisition',
+          severity: 'error',
+        })
+      }
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: 'Error deleting job requisition',
+        severity: 'error',
+      })
+    } finally {
+      setDeletingId(null)
+    }
+  }
 
   const filteredJobs = jobs.filter((job) => {
     const matchesSearch =
@@ -190,10 +239,15 @@ export default function JobListPage() {
       ) : (
         /* Job Requisitions Grid */
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {filteredJobs.map((job) => (
-            <Paper
+          {filteredJobs.map((job, index) => (
+            <motion.div
               key={job.id}
-              onClick={() => handleJobClick(job.id)}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.05 }}
+            >
+              <Paper
+                onClick={() => handleJobClick(job.id)}
               sx={{
                 p: 3,
                 cursor: 'pointer',
@@ -333,6 +387,7 @@ export default function JobListPage() {
                 </Box>
               </Box>
             </Paper>
+            </motion.div>
           ))}
         </Box>
       )}

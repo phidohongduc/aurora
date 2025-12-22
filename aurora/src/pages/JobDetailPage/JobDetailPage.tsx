@@ -13,6 +13,7 @@ import {
   Alert,
   Grid,
 } from '@mui/material'
+import { motion } from 'motion/react'
 import {
   ArrowLeft,
   Upload,
@@ -273,7 +274,12 @@ export default function JobDetailPage() {
       </Button>
 
       {/* Job Header */}
-      <Paper sx={{ p: 3, mb: 3 }}>
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <Paper sx={{ p: 3, mb: 3 }}>
         <Box
           sx={{
             display: 'flex',
@@ -344,11 +350,17 @@ export default function JobDetailPage() {
           </Box>
         </Box>
       </Paper>
+      </motion.div>
 
       {/* Main Content Grid */}
       <Grid container gap={3}>
         {/* first  Panel - Job Details */}
         <Grid size={{ xs: 12, lg: 12 }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+          >
           <Paper sx={{ p: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
               <Briefcase size={20} className="text-blue-600" strokeWidth={1.5} />
@@ -424,11 +436,17 @@ export default function JobDetailPage() {
               </Box>
             )}
           </Paper>
+          </motion.div>
         </Grid>
 
         {/* second Panel - Candidates */}
         <Grid size={{ xs: 12, lg: 12 }}>
-          <Paper sx={{ p: 3 }}>
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+          >
+            <Paper sx={{ p: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Users size={20} className="text-blue-600" strokeWidth={1.5} />
@@ -482,7 +500,7 @@ export default function JobDetailPage() {
 
                     {/* Candidate List Items */}
                     <Box>
-                      {cvs.map((cv) => {
+                      {cvs.map((cv, index) => {
                         const isSelected = cv.id === selectedCvId
                         const aiMatchScore = cv.parsed?.aiMatchScore || 0
                         const yearsExp = cv.parsed?.yearsOfExperience || 0
@@ -490,8 +508,13 @@ export default function JobDetailPage() {
                         const fitLevel = cv.parsed?.fitLevel || 'Medium'
 
                         return (
-                          <Box
+                          <motion.div
                             key={cv.id}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.3, delay: 0.3 + index * 0.05 }}
+                          >
+                            <Box
                             onClick={() => setSelectedCvId(cv.id)}
                             sx={{
                               p: 3,
@@ -584,6 +607,7 @@ export default function JobDetailPage() {
                               />
                             </Box>
                           </Box>
+                          </motion.div>
                         )
                       })}
                     </Box>
@@ -634,6 +658,7 @@ export default function JobDetailPage() {
               </Grid>
             )}
           </Paper>
+          </motion.div>
         </Grid>
       </Grid>
     </Container>

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material'
 import { FloatingDock, type DockItem } from '@/components/ui'
+import { AICompanion } from '@/components/AICompanion'
 import { Home, Briefcase, PlusCircle, Upload } from 'lucide-react'
 import {
   MainPage,
@@ -102,7 +103,7 @@ function App() {
       <CssBaseline />
       <BrowserRouter>
         <div className="relative flex min-h-screen flex-col">
-          <main className="flex-1 pb-24">
+          <main className="flex-1 pb-24 pr-[380px]">
             <Routes>
               <Route path="/" element={<MainPage />} />
               <Route path="/jobs" element={<JobListPage />} />
@@ -111,9 +112,10 @@ function App() {
               <Route path="/jobs/:id/upload" element={<UploadCVPage />} />
             </Routes>
           </main>
-          <div className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2">
+          <div className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2 -ml-[190px]">
             <FloatingDock items={navigationItems} />
           </div>
+          <AICompanion />
         </div>
       </BrowserRouter>
     </ThemeProvider>
