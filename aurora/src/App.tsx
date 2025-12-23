@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material'
 import { FloatingDock, type DockItem } from '@/components/ui'
 import { AICompanion } from '@/components/AICompanion'
-import { Home, Briefcase, PlusCircle, Users, UserCircle } from 'lucide-react'
+import { Home, Briefcase, PlusCircle, Users, UserCircle, LayoutDashboard } from 'lucide-react'
 import {
   MainPage,
   JobListPage,
@@ -12,6 +12,7 @@ import {
   EmployeesPage,
   EmployeeSkillNetworkPage,
   CandidateDirectoryPage,
+  DashboardPage,
 } from '@/pages'
 
 const theme = createTheme({
@@ -84,6 +85,11 @@ const navigationItems: DockItem[] = [
     href: '/',
   },
   {
+    title: 'Dashboard',
+    icon: <LayoutDashboard className="w-full h-full text-gray-600" strokeWidth={1.5} />,
+    href: '/dashboard',
+  },
+  {
     title: 'Job Requisitions',
     icon: <Briefcase className="w-full h-full text-gray-600" strokeWidth={1.5} />,
     href: '/jobs',
@@ -114,6 +120,7 @@ function App() {
           <main className="flex-1 pb-24">
             <Routes>
               <Route path="/" element={<MainPage />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/jobs" element={<JobListPage />} />
               <Route path="/jobs/new" element={<CreateJobPage />} />
               <Route path="/jobs/:id" element={<JobDetailPage />} />
