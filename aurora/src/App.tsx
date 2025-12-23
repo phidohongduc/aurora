@@ -11,6 +11,7 @@ import {
   UploadCVPage,
   EmployeesPage,
   EmployeeSkillNetworkPage,
+  EmployeeNetworkPage,
   CandidateDirectoryPage,
   DashboardPage,
 } from '@/pages'
@@ -127,6 +128,7 @@ function App() {
               <Route path="/jobs/:id/upload" element={<UploadCVPage />} />
               <Route path="/employees" element={<EmployeesPage />} />
               <Route path="/employees/skill-network" element={<EmployeeSkillNetworkPage />} />
+              <Route path="/employees/network" element={<EmployeeNetworkPage />} />
               <Route path="/candidates" element={<CandidateDirectoryPage />} />
             </Routes>
           </main>

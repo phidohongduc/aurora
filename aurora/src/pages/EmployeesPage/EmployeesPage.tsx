@@ -7,7 +7,6 @@ import {
   Paper,
   TextField,
   Grid,
-  Avatar,
   Chip,
   InputAdornment,
   Card,
@@ -16,16 +15,14 @@ import {
   DialogContent,
   IconButton,
   Button,
+  ButtonGroup,
   LinearProgress,
   Divider,
 } from '@mui/material'
 import { motion } from 'motion/react'
-import { 
-  Search, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Briefcase, 
+import {
+  Search,
+  Briefcase,
   Calendar,
   FileText,
   FolderKanban,
@@ -33,6 +30,7 @@ import {
   ExternalLink,
   User as UserIcon,
   Network,
+  GitBranch,
 } from 'lucide-react'
 
 interface Employee {
@@ -214,14 +212,47 @@ export default function EmployeesPage() {
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-            <Button
+            <ButtonGroup
               variant="contained"
-              startIcon={<Network size={18} />}
-              onClick={() => navigate('/employees/skill-network')}
-              sx={{ whiteSpace: 'nowrap' }}
+              sx={{
+                boxShadow: '0 4px 14px rgba(102, 126, 234, 0.3)',
+                '& .MuiButton-root': {
+                  borderRadius: '12px !important',
+                  px: 2.5,
+                  py: 1,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                },
+                '& .MuiButtonGroup-grouped:not(:last-of-type)': {
+                  borderColor: 'rgba(255,255,255,0.3)',
+                },
+              }}
             >
-              Skill Network
-            </Button>
+              <Button
+                startIcon={<Network size={18} />}
+                onClick={() => navigate('/employees/skill-network')}
+                sx={{
+                  background: 'linear-gradient(135deg, #667EEA 0%, #764BA2 100%)',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #5a6fd6 0%, #6a4290 100%)',
+                  },
+                }}
+              >
+                Skill Network
+              </Button>
+              <Button
+                startIcon={<GitBranch size={18} />}
+                onClick={() => navigate('/employees/network')}
+                sx={{
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #0ea572 0%, #048a5c 100%)',
+                  },
+                }}
+              >
+                Graph Network
+              </Button>
+            </ButtonGroup>
             <Box sx={{ textAlign: 'right' }}>
               <Typography variant="h3" color="primary.main" fontWeight="bold">
                 {mockEmployees.length}
@@ -477,10 +508,10 @@ export default function EmployeesPage() {
                   </Typography>
                 </Box>
               </Box>
-              <IconButton 
-                onClick={() => setSelectedEmployee(null)} 
-                sx={{ 
-                  width: 40, 
+              <IconButton
+                onClick={() => setSelectedEmployee(null)}
+                sx={{
+                  width: 40,
                   height: 40,
                   '&:hover': { bgcolor: 'grey.100' }
                 }}
