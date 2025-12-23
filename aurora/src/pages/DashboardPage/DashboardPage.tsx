@@ -41,11 +41,11 @@ import {
 
 // Mock HR Dashboard Data - Technical/Engineering focused
 const hrStats = {
-    totalEmployees: 142,
-    activeEmployees: 138,
-    newHires: 14,
-    attrition: 3,
-    openPositions: 12,
+    totalEmployees: 382,
+    activeEmployees: 378,
+    newHires: 15,
+    attrition: 8,
+    openPositions: 28,
     avgTenure: 3.2,
     trainingCompletion: 91,
     performanceScore: 4.4,
@@ -53,24 +53,24 @@ const hrStats = {
 
 // Technical-focused department data
 const departmentData = [
-    { name: 'Frontend', count: 28, color: '#6366f1' },
-    { name: 'Backend', count: 32, color: '#8b5cf6' },
-    { name: 'DevOps/SRE', count: 18, color: '#ec4899' },
-    { name: 'Data/ML', count: 22, color: '#f59e0b' },
-    { name: 'Mobile', count: 16, color: '#22c55e' },
-    { name: 'QA/Testing', count: 14, color: '#06b6d4' },
-    { name: 'Security', count: 8, color: '#ef4444' },
-    { name: 'Product/Design', count: 4, color: '#64748b' },
+    { name: 'Frontend', count: 75, color: '#6366f1' },
+    { name: 'Backend', count: 86, color: '#8b5cf6' },
+    { name: 'DevOps/SRE', count: 48, color: '#ec4899' },
+    { name: 'Data/ML', count: 59, color: '#f59e0b' },
+    { name: 'Mobile', count: 43, color: '#22c55e' },
+    { name: 'QA/Testing', count: 38, color: '#06b6d4' },
+    { name: 'Security', count: 21, color: '#ef4444' },
+    { name: 'Product/Design', count: 12, color: '#64748b' },
 ]
 
 // Hiring trend data for line chart
 const hiringTrendData = [
-    { month: 'Jul', hires: 4, attrition: 1 },
-    { month: 'Aug', hires: 6, attrition: 2 },
-    { month: 'Sep', hires: 8, attrition: 1 },
-    { month: 'Oct', hires: 5, attrition: 2 },
-    { month: 'Nov', hires: 7, attrition: 1 },
-    { month: 'Dec', hires: 14, attrition: 3 },
+    { month: 'Jul', hires: 10, attrition: 2 },
+    { month: 'Aug', hires: 12, attrition: 1 },
+    { month: 'Sep', hires: 15, attrition: 2 },
+    { month: 'Oct', hires: 14, attrition: 1 },
+    { month: 'Nov', hires: 16, attrition: 1 },
+    { month: 'Dec', hires: 15, attrition: 1 },
 ]
 
 // Tech stack distribution for pie chart
@@ -98,20 +98,20 @@ const upcomingReviews = [
 
 // Technical certifications progress
 const trainingProgress = [
-    { name: 'AWS Solutions Architect', progress: 92, total: 48, completed: 44 },
-    { name: 'Kubernetes (CKA/CKAD)', progress: 78, total: 32, completed: 25 },
-    { name: 'Security Compliance', progress: 95, total: 142, completed: 135 },
-    { name: 'System Design', progress: 65, total: 86, completed: 56 },
+    { name: 'AWS Solutions Architect', progress: 92, total: 128, completed: 118 },
+    { name: 'Kubernetes (CKA/CKAD)', progress: 78, total: 86, completed: 67 },
+    { name: 'Security Compliance', progress: 95, total: 382, completed: 363 },
+    { name: 'System Design', progress: 65, total: 230, completed: 150 },
 ]
 
-// Engineering velocity data
+// Engineering velocity data (December weeks with hiring info)
 const velocityData = [
     { week: 'W1', velocity: 78, bugs: 12 },
     { week: 'W2', velocity: 82, bugs: 8 },
     { week: 'W3', velocity: 75, bugs: 15 },
     { week: 'W4', velocity: 88, bugs: 6 },
-    { week: 'W5', velocity: 92, bugs: 5 },
-    { week: 'W6', velocity: 95, bugs: 4 },
+    { week: 'W5', velocity: 92, bugs: 5 },  // 5 new hires last week
+    { week: 'W6', velocity: 95, bugs: 4 },  // 5 new hires this week
 ]
 
 const StatCard = ({
@@ -174,7 +174,7 @@ export default function DashboardPage() {
             >
                 <Box sx={{ mb: 4 }}>
                     <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
-                        Engineering HR Dashboard
+                        HR Dashboard
                     </Typography>
                     <Typography variant="body1" color="text.secondary">
                         Real-time overview of technical workforce metrics and insights
@@ -194,7 +194,7 @@ export default function DashboardPage() {
                     >
                         <StatCard
                             icon={Code}
-                            label="Total Engineers"
+                            label="Total Employees"
                             value={hrStats.totalEmployees}
                             change="+12%"
                             color="#6366f1"
@@ -358,8 +358,8 @@ export default function DashboardPage() {
                     </motion.div>
                 </Grid>
 
-                {/* Row 3: Team Distribution + Engineering Velocity */}
-                <Grid size={{ xs: 12, md: 6 }}>
+                {/* Row 3: Team Distribution */}
+                <Grid size={{ xs: 12 }}>
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -402,54 +402,6 @@ export default function DashboardPage() {
                                     </Grid>
                                 ))}
                             </Grid>
-                        </Paper>
-                    </motion.div>
-                </Grid>
-
-                <Grid size={{ xs: 12, md: 6 }}>
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, delay: 0.45 }}
-                        style={{ height: '100%' }}
-                    >
-                        <Paper variant="outlined" sx={{ p: 3, height: '100%', minHeight: 320 }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
-                                <Target size={20} color="#22c55e" />
-                                <Typography variant="h6" fontWeight={600}>
-                                    Engineering Velocity
-                                </Typography>
-                            </Box>
-                            <ResponsiveContainer width="100%" height={240}>
-                                <LineChart data={velocityData}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                                    <XAxis dataKey="week" stroke="#94a3b8" fontSize={12} />
-                                    <YAxis stroke="#94a3b8" fontSize={12} />
-                                    <Tooltip
-                                        contentStyle={{
-                                            backgroundColor: 'white',
-                                            border: '1px solid #e2e8f0',
-                                            borderRadius: 8
-                                        }}
-                                    />
-                                    <Line
-                                        type="monotone"
-                                        dataKey="velocity"
-                                        stroke="#22c55e"
-                                        strokeWidth={2}
-                                        dot={{ fill: '#22c55e', strokeWidth: 2, r: 4 }}
-                                        name="Velocity Score"
-                                    />
-                                    <Line
-                                        type="monotone"
-                                        dataKey="bugs"
-                                        stroke="#ef4444"
-                                        strokeWidth={2}
-                                        dot={{ fill: '#ef4444', strokeWidth: 2, r: 4 }}
-                                        name="Bug Count"
-                                    />
-                                </LineChart>
-                            </ResponsiveContainer>
                         </Paper>
                     </motion.div>
                 </Grid>
