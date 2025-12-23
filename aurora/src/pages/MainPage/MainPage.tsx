@@ -105,11 +105,11 @@ export default function MainPage() {
                 random: true,
               },
               size: {
-                value: { min: 1, max: 3 },
+                value: { min: 1, max: 7 },
               },
               move: {
                 enable: true,
-                speed: 0.4,
+                speed: 0.8,
                 direction: 'none',
                 outModes: { default: 'out' },
               },
@@ -151,7 +151,6 @@ export default function MainPage() {
           <Typography variant="h2" fontWeight={700} gutterBottom>
             Your AI companion for hiring
           </Typography>
-
           <Typography
             variant="h6"
             color="text.secondary"

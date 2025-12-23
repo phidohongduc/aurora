@@ -17,6 +17,8 @@ interface Suggestion {
     action?: () => void
 }
 
+export const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8001'
+
 export function AICompanion() {
     const location = useLocation()
     const [isOpen, setIsOpen] = useState(true)
@@ -129,7 +131,7 @@ export function AICompanion() {
 
             try {
                 // Call the backend API
-                const response = await fetch('http://localhost:8000/fill-job-requisition', {
+                const response = await fetch(`${BACKEND_URL}/fill-job-requisition`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -237,7 +239,7 @@ export function AICompanion() {
 
             try {
                 // Call the backend API
-                const response = await fetch('http://localhost:8000/fill-job-requisition', {
+                const response = await fetch( `${BACKEND_URL}/fill-job-requisition`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
